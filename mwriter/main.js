@@ -4,22 +4,7 @@ const utils = require('./utils')
 const uuidgen = require('uuid/v4');
 const main_utils = require('./main_utils')
 const Store = require('electron-store')
-const request = require('superagent');
 const store = new Store()
-const { URL } = require('url')
-const htmlToText = require('html-to-text');
-const fs = require('fs')
-
-/* config */
-let g_config_cache = null
-
-g_config_cache = store.get('config', {
-  notify_change: true,
-  notify_exception: true,
-  notify_recovery: true,
-  check_interval: 'B',
-  launch_at_login: true
-})
 
 // /* Single instance */
 // if (utils.is_win()) {

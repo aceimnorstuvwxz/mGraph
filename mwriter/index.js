@@ -11,7 +11,9 @@ const { Menu, MenuItem } = remote
 const Store = require('electron-store')
 const store = new Store()
 const htmlencode = require('htmlencode');
-const URL = require('url')
+const urllib = require('url')
+const fs = require('fs')
+const mystore = require('./mystore')
 const TurndownService = require('turndown')
 let turndownService = new TurndownService({
   headingStyle: 'atx',
@@ -164,26 +166,29 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(save_routine, 30 * 1000)
 
 
-  setTimeout(function(){
-    let t = store.get('target')
-    if (t) {
-      on_select_target(t)
-    }
+  // setTimeout(function(){
+  //   let t = store.get('target')
+  //   if (t) {
+  //     on_select_target(t)
+  //   }
 
-    if (store.get('mdguide', false)) {
-      on_click_btn_mdguide()
-    }
+  //   if (store.get('mdguide', false)) {
+  //     on_click_btn_mdguide()
+  //   }
     
-  }, 200)
+  // }, 200)
 
-  setTimeout(function(){
-    let t = store.get('record')
-    if (t) {
-      on_select_record(t)
-    }
-  }, 500)
+  // setTimeout(function(){
+  //   let t = store.get('record')
+  //   if (t) {
+  //     on_select_record(t)
+  //   }
+  // }, 500)
 
   reset_target_space_width()
+
+
+  reload_targets();
 })
 
 /* targets */
@@ -196,16 +201,6 @@ function add_new_target_element(target) {
   let new_element = $('#target_template').clone()
   new_element.removeAttr('id')
   new_element.find('.target-name').text(target.name)
-  new_element.find('.target-address').text(target.address)
-  new_element.find('.target-indication').attr('indication', target.read == 0 ? 'true' : 'false')
-  new_element.find('.target-paused').attr('paused', target.state == utils.TARGET_STATE.NORMAL ? "false" : "true")
-  new_element.find('.target-muted').attr('muted', target.muted == 0 ? "false" : "true")
-
-  let icon = target.icon
-  if (icon.length == 0) {
-    icon = "images/default-target-icon.png"
-  }
-  new_element.find('.target-image').attr('src', icon)
 
   new_element.prependTo('#target_list')
   new_element.web_target = target
@@ -324,36 +319,55 @@ electron.ipcRenderer.on('new-target-icon', function (e, data) {
 })
 
 let g_selected_target_element = null
-function on_select_target(target_id) {
 
-  g_selected_target_nomore_record = false
-  g_record_more_loading = false
-  let element = g_target_map[target_id]
-  let target = element.web_target
-  console.log('click select element', target.name, target.id)
+function on_select_target(target) {
+  $('#help_space').hide()
+  $('#record_space').show()
+  $('#content_space').show()
+
+  let element = g_target_map[target]
+  console.log('click select element', target)
 
   if (g_selected_target_element == element) {
-    //same one, pass
-    return
+      return
   }
 
-  //unselect current
-  unselect_current_target()
+  if (g_selected_target_element) {
+      g_selected_target_element.attr('select', 'false')
+  }
 
-  //select new
   element.attr('select', 'true')
   g_selected_target_element = element
 
-  //clear records ui
   $('#record_list').empty()
   g_record_map = {}
 
-  //get new target's records
-  electron.ipcRenderer.send('get-some-records', { target_id: target.id, offset: $('.record').length - 1 }) //offset remove template
+  reload_target_records()
+}
 
-  element.find('.target-indication').attr('indication', 'false')
+let IMG_EXT_LIST = ['md', 'MD']
+function reload_target_records() {
+    let target = g_selected_target_element.web_target
+    console.log('reload target reocrds', target)
 
-  store.set('target', target_id)
+    if (!fs.existsSync(target)) {
+        alert(`${target} ${utils.lg('不存在', "doesn't exist")}`)
+        return
+    }
+
+
+    fs.readdir(target, (err, files) => {
+        files.forEach(file => {
+            // console.log(file);
+            let ext = utils.get_file_ext(file)
+            if (IMG_EXT_LIST.indexOf(ext) != -1) {
+                //is image
+                add_new_record_element(file)
+            }
+        });
+        //TODO should check file is real file
+        //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
+    })
 }
 
 function unselect_current_target() {
@@ -377,19 +391,37 @@ function unselect_current_record() {
 }
 
 function update_moment_time() {
-  for (let key in g_record_map) {
-    let record_element = g_record_map[key]
-    record_element.find('.record-time').text(record_element.web_time.fromNow())
-  }
+  // for (let key in g_record_map) {
+  //   let record_element = g_record_map[key]
+  //   record_element.find('.record-time').text(record_element.web_time.fromNow())
+  // }
 }
 
 function on_click_new_target() {
-  g_is_target_new = true
-  $('#target_dialog_title').text('New Collection')
-  $('#new_target_name').val("")
-  $('#new_target_address').val("")
+  let folder_name = electron.remote.dialog.showOpenDialog({ properties: ['openDirectory'] })
+  console.log(folder_name)
+  if (folder_name && folder_name.length > 0) {
+      folder_name = folder_name[0]
+      if (mystore.get_targets().indexOf(folder_name) != -1) {
+          alert(utils.lg('这个文件夹早就被加入了', 'This folder has already been added'))
+      } else {
+          mystore.add_target(folder_name)
+      }
+  }
 
-  $('#new_target_dialog').modal('show')
+  reload_targets()
+}
+
+function reload_targets() {
+  let targets = mystore.get_targets()
+  console.log('targets', targets)
+
+  $('#target_list').empty()
+  g_target_map = {}
+
+  targets.forEach(target => {
+      add_new_target_element(target)
+  })
 }
 
 function on_click_config_target(target_element) {
@@ -480,36 +512,18 @@ function right_showing_desc(record) {
   return t
 }
 
-function add_new_record_element(record, at_top = false) {
+function add_new_record_element(record) {
+
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
-  new_element.find('.record-title').text(right_showing_title(record))
-  new_element.find('.record-desc').text(right_showing_desc(record))
-  new_element.find('.record-image img').attr('src', 'http://wx3.sinaimg.cn/mw600/72b33adagy1fnmdw23lnvj21r61sgu10.jpg')
-  let time = moment.unix(record.create_time / 1000)
-  // new_element.find('.record-time').text(time.fromNow())
+  new_element.find('.record-name').text(record)
+
   new_element.web_record = record
-  new_element.web_time = time
-  if (at_top) {
-    new_element.prependTo('#record_list')
-  } else {
-    new_element.appendTo('#record_list')
-  }
+  new_element.appendTo('#record_list')
 
-  g_record_map[record.id] = new_element
-  new_element.click(on_select_record.bind(null, record.id))
+  g_record_map[record] = new_element
+  new_element.click(on_select_record.bind(null, record))
 
-  new_element.contextmenu(function (e) {
-    e.preventDefault()
-    const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Delete', click: on_click_remove_record.bind(null, new_element) }))
-    menu.append(new MenuItem({ type: 'separator' }))
-    menu.append(new MenuItem({ label: 'New Article', click: on_click_new_record }))
-
-    menu.popup({ window: remote.getCurrentWindow() })
-  })
-
-  return new_element
 }
 
 let g_selected_record_element = null

@@ -6,8 +6,7 @@
   <title>Langedit</title>
 
   <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
-  <!-- <link href="libs/iconfont.css" rel="stylesheet" /> -->
-  <link href="http://at.alicdn.com/t/font_604243_ovbuy53nb8qqto6r.css" rel="stylesheet" />
+  <link href="libs/iconfont.css" rel="stylesheet" />
   <script src="libs/jquery.js"></script>
 
   <script type="text/javascript" src="libs/bootstrap.js"></script>
@@ -26,19 +25,19 @@
 <body>
   <div id="window_header" class="drag">
     <div id="head_folder" class="head_segments">
-      
+
     </div>
     <div id="head_list" class="head_segments">
-<!-- 
-      <a class="btn-head">
-        <i class="iconfont icon-search1 btn-head-icon"></i>
-      </a> -->
+
       <a class="btn-head" id="btn_toggle_targets">
         <i class="iconfont icon-hidesidebarhoriz" id="hide_icon"></i>
         <i class="iconfont icon-showsidebarhoriz" id="show_icon"></i>
       </a>
+      <a class="btn-head" id="btn_add_new_target">
+        <i class="iconfont icon-folderplus btn-head-icon"></i>
+      </a>
       <a class="btn-head" id="btn_add_record">
-        <i class="iconfont icon-cc-write btn-head-icon"></i>
+        <i class="iconfont icon-write btn-head-icon"></i>
       </a>
 
     </div>
@@ -95,39 +94,13 @@
   <div id="total">
 
     <!-- targets -->
-    <div id="targets_space" class="ani">
+    <div id="target_space" class="ani">
 
       <div id="target_space_header" class="space-header">
       </div>
       <div class="template">
         <div class="target" id="target_template">
-          <div class="target-image-wrapper">
-            <!-- <div>
-              <img class="target-image" src="https://ws3.sinaimg.cn/large/006tNc79gy1fp6z2we00dj300z010t8h.jpg" />
-            </div> -->
-            <div class="target-indication" indication="true">
-            </div>
-          </div>
-
-          <div>
-            <div class="target-name-line">
-              <div class="target-name-wraper">
-                <span class="target-name">MacRumors</span>
-              </div>
-              <div class="flex-push"></div>
-
-
-              <div class="target-paused" paused="true">
-                <i class="iconfont icon-mediapause"></i>
-              </div>
-              <div class="target-muted" muted="true">
-                <i class="iconfont icon-icon_mute"></i>
-              </div>
-            </div>
-            <div class="target-address">
-              http://www.macrumors.com/index.html
-            </div>
-          </div>
+          <span class="target-name">MacRumors</span>
 
         </div>
       </div>
@@ -138,7 +111,8 @@
 
       </div>
       <!-- remove target dialog -->
-      <div class="modal fade" id="remove_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="remove_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -159,7 +133,8 @@
         </div>
       </div>
       <!-- remove target records dialog -->
-      <div class="modal fade" id="delete_records_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="delete_records_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -181,7 +156,8 @@
       </div>
 
       <!-- Add new target dialog -->
-      <div class="modal fade" id="new_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="new_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -223,29 +199,15 @@
     <!-- target space end -->
 
 
-    <div id="records_space">
+    <div id="record_space">
 
       <!-- <div id="target_space_header" class="space-header">
             <a href="#" class="header-btn">[Clear]</a>
           </div> -->
       <div class="template">
+
         <div class="record" id="record_template">
-          <div class="record-title">
-            Arizona Governor Suspends Uber’s Self-Driving Cars From Roads
-          </div>
-
-          <div class="record-body">
-            <div class="record-desc">
-              Doug Ducey on Monday ordered Uber Technologies Inc. to suspend testing autonomous vehicles on public roadways in the state,
-              a rebuke by a former supporter that takes the company’s decision on testing out of its hands.ion on testing
-              out of its hands.ion on testing out of its hands.
-            </div>
-<!-- 
-            <div class="record-image">
-              <img src="http://wx3.sinaimg.cn/mw600/72b33adagy1fnmdw23lnvj21r61sgu10.jpg" />
-            </div> -->
-          </div>
-
+          <div class="record-name">record name</div>
         </div>
       </div>
       <div id="record_list">
@@ -331,7 +293,8 @@
   <div id="dialogs">
 
     <!-- remove target records dialog -->
-    <div class="modal fade" id="article_info_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="article_info_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -364,7 +327,8 @@
     </div>
 
     <!-- remove target dialog -->
-    <div class="modal fade" id="remove_record_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="remove_record_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
