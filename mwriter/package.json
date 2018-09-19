@@ -1,11 +1,11 @@
 {
-  "name": "Langedit",
+  "name": "mwriter",
   "version": "1.0.0",
-  "productName": "Langedit",
-  "description": "Open Source Web service monitor, web content change monitor",
+  "productName": "MWriter",
+  "description": "Markdown Writer for hackers",
   "main": "main.js",
   "build": {
-    "appId": "com.boringuniverse.Langedit",
+    "appId": "com.netqon.mwriter",
     "mac": {
       "category": "public.app-category.productivity"
     },
@@ -14,28 +14,11 @@
       "extraFiles": "*.dll"
     }
   },
-  "repository": "https://github.com/fateleak/Langedit",
+  "repository": "https://github.com/fateleak/mwriter",
   "keywords": [
     "Netqon",
     "BoringUniverse",
-    "Langedit",
-    "distill",
-    "webwatch",
-    "onwebchange",
-    "colorpad",
-    "language editor",
-    "翻译工作室",
-    "fateleak",
-    "web content monitor",
-    "web service monitor",
-    "姚俊容",
-    "无码科技 脉脉 V2EX",
-    "文章自动翻译工具",
-    "v2ex",
-    "36kr",
-    "翻译写作工具",
-    "opensource",
-    "translation studio"
+    "markdown"
   ],
   "author": "netqon.com",
   "license": "MIT",
@@ -46,13 +29,7 @@
     "dist": "electron-builder"
   },
   "dependencies": {
-    "active-win-lite": "^2.1.3",
-    "cheerio": "^1.0.0-rc.2",
-    "deep-diff": "^0.3.8",
-    "diff-match-patch": "^1.0.0",
-    "electron-notifications-lite": "^1.2.0",
     "electron-store": "^1.3.0",
-    "get-favicons": "^1.0.0",
     "html-to-text": "^4.0.0",
     "htmlencode": "0.0.4",
     "jsonfile": "^4.0.0",
@@ -69,7 +46,7 @@
     "word-count": "^0.2.2"
   },
   "devDependencies": {
-    "electron": "^1.7.10",
-    "electron-builder": "^19.49.0"
+    "electron": "^3.0.0",
+    "electron-builder": "^20.28.4"
   }
 }
