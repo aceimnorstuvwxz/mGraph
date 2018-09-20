@@ -196,7 +196,7 @@ function get_menu_template() {
     )
   }
 
-  if (utils.is_dev()) {
+  if (utils.is_dev) {
     menuTemplate.push({
       label: 'Dev',
       submenu: [

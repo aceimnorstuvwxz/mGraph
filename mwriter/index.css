@@ -6,26 +6,29 @@
     --system-split-color: #d4d4d4;
     --system-hover-color: rgb(216, 216, 216);
     --system-active-color: rgb(200, 219, 219);
+
+    --system-base-color: rgb(244,242,243);
   }
 
 * {
-    /* transition: all 0.15s ease-in-out;  */
-    /* overflow: hidden;  this will ban the cursor in editor */
     margin: 0px;
     padding: 0px;
 }
 
+a{
+    user-select: none;
+    cursor: default;
+}
 .ani{
     transition: all 0.2s ease-in-out; 
-    /* TODO not work! */
 }
 
 body{
-    background-color: white;
+    background-color: var(--system-base-color);
     color: #333;
-    font-family: GillSans, Calibri, Trebuchet, sans-serif;
     display: grid;
     grid-template-rows: 30px 1fr;
+    font-size: 14px;
 }
 
 html, body{
@@ -45,9 +48,8 @@ html, body{
 
 #window_header{
     border-bottom: 1px solid var(--system-split-color);
-    background: var(--system-bg1-color);
     display: grid;
-    grid-template-columns: 80px 120px 1fr 1fr;
+    grid-template-columns: 100px 120px 1fr 1fr;
     border-bottom: 1px var(--system-split-color) solid;
 }
 
@@ -55,7 +57,6 @@ html, body{
     display: inline-block;
     padding: 0px 10px;
     border-radius: 5px;
-    /* background: #ffffff; */
     margin-right: 1px;
     margin-left: 1px;
 }
@@ -95,33 +96,17 @@ html, body{
     padding-left: 0px;
 }
 
-.btn-head-left{
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-}
-.btn-head-right{
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-}
-
-/* main area */
 #total{
     display: grid;
-    grid-template-columns: 0px 200px 1fr auto;
-    background: var(--system-bg-color);
+    grid-template-columns: 100px 200px 1fr auto;
 }
 
 #target_space{    
-    background: var(--system-bg-color);
     height: 100%;
-    background: #4A4A4A;
-    color: white;
     border-right: 1px solid rgb(216, 216, 216);
-
 }
 
 #record_space{
-    background: white;
     height: 100%;
     border-right: 1px solid rgb(216, 216, 216);
 }
@@ -130,64 +115,6 @@ html, body{
     display: grid;
     grid-template-columns: 1fr 1fr;
     max-height: calc(100vh - 30px);
-}
-
-.editor{
-}
-
-#src_editor{
-}
-
-#des_editor{
-}
-
-#preview{
-    display: none;
-    overflow: scroll;
-    max-height: calc(100vh - 30px);
-    background: white;
-    font-family: system-ui;
-    padding: 50px;
-}
-
-#side{
-    width: 120px;
-    max-height: calc(100vh - 30px);
-    overflow: scroll;
-    background: var(--system-bg-color);
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 12px;
-    padding: 3px;
-    display: none;
-    border-left: 1px solid var(--system-split-color);
-}
-
-.side-head{
-    /* border: 1px dashed var(--system-theme-color); */
-    font-weight: bold;
-}
-
-#mdguide{
-}
-
-#mdguide div{
-    cursor: pointer;
-    padding: 3px 0px;
-}
-
-#mdguide div:hover{
-    position: relative;
-    left: 5px;
-}
-
-#mdguide div:active{
-    color: var(--system-theme-color);
-}
-
-/* header common */
-.space-header{
-    position: fixed;
-    top: 0px;
 }
 
 .header-btn{
@@ -201,7 +128,6 @@ html, body{
     font-weight: bold;
 }
 
-/* target */
 .template{
     display: none;
 }
@@ -211,40 +137,20 @@ html, body{
     overflow: scroll;
 }
 
-#fill_target_space{
-    height: 100vh;
-}
 
-
-#target_add{
-    position: fixed; 
-    left:85px; 
-    bottom:0px; 
-    margin: 10px;
-    border-radius: 50%;
-    height: 1.5em;
-    width: 1.5em;
-    background: #5588a3;
-    text-align: center;
-}
-
-.target_add_button{
-    color: white;
+.text-btn{
+    font-size: 12px;
 }
 
 .target{
     cursor: pointer;
-    background: white;
-    border-bottom: 1px solid rgb(103, 103, 103);
-    padding: 10px 0px;
-    padding-left: 10px;
+    padding: 3px 15px;
     color: black;
     font-size: 16px;
 }
 
 .target[select="true"]{
-    background: rgb(1, 193, 1);
-    color: white;
+    background: rgb(208, 208, 208);
 }
 
 /* records */
@@ -265,7 +171,6 @@ html, body{
 
 .record{
     border-bottom: #EEE 1px solid;
-    background: white;
     cursor: pointer;
     padding: 10px 0px;
     padding-left: 10px;
@@ -317,8 +222,6 @@ html, body{
     background: white;
   }
 
-
-
 .info-big{
     font-size: 30px;
 }
@@ -328,8 +231,19 @@ html, body{
 }
 
 blockquote{
-    background: rgb(238, 238, 238);
     padding: 5px;
     margin-left: 10px;
     border-left: 3px solid #00d9ff;
+}
+
+
+#target_foot{
+    position: fixed;
+    bottom: 5px;
+    left: 10px;
+}
+
+#target_foot .iconfont{
+    position: relative;
+    top:2px;
 }

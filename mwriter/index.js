@@ -200,13 +200,16 @@ let g_record_more_loading = false //防止大量的record加载
 function add_new_target_element(target) {
   let new_element = $('#target_template').clone()
   new_element.removeAttr('id')
-  new_element.find('.target-name').text(target.name)
+  let ww = target.split(path.sep)
+  let p = ww.pop()
+  let p2 = ww.pop()
+  new_element.find('.target-name').text(p)
 
   new_element.prependTo('#target_list')
   new_element.web_target = target
-  g_target_map[target.id] = new_element
+  g_target_map[target] = new_element
 
-  new_element.click(on_select_target.bind(null, target.id))
+  new_element.click(on_select_target.bind(null, target))
 
   new_element.contextmenu(function (e) {
     e.preventDefault()

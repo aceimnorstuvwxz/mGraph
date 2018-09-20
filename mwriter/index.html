@@ -33,30 +33,12 @@
         <i class="iconfont icon-hidesidebarhoriz" id="hide_icon"></i>
         <i class="iconfont icon-showsidebarhoriz" id="show_icon"></i>
       </a>
-      <a class="btn-head" id="btn_add_new_target">
-        <i class="iconfont icon-folderplus btn-head-icon"></i>
-      </a>
       <a class="btn-head" id="btn_add_record">
         <i class="iconfont icon-write btn-head-icon"></i>
       </a>
 
     </div>
     <div id="head_edit_src" class="head_segments">
-      <!-- 
-      <a class="btn-head">
-        <i class="iconfont icon-import btn-head-icon"></i>
-      </a> -->
-
-      <!-- 
-      <a class="btn-head">
-        <i class="iconfont icon-tag btn-head-icon"></i>
-      </a> -->
-      <!-- 
-      <a class="btn-head">
-        <i class="iconfont icon-diamond btn-head-icon" id="btn_dev"></i>
-      </a> -->
-      <!-- <div class="flex-push"></div> -->
-
       <a class="btn-head btn-head-left" pressed="true" id="btn_markdown">
         <i class="iconfont icon-markdown btn-head-icon"></i>
       </a>
@@ -107,103 +89,17 @@
       <div id="target_list">
 
       </div>
-      <div id="fill_target_space">
 
-      </div>
-      <!-- remove target dialog -->
-      <div class="modal fade" id="remove_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Remove Target</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              Are you sure to remove
-              <span id="remove_target_name">MacRumors</span> and its data?
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="btn_remove_target_confirm">Remove</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- remove target records dialog -->
-      <div class="modal fade" id="delete_records_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Delete Records</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              Are you sure to delete
-              <span id="delete_records_target_name">MacRumors</span>'s all records?
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="btn_delete_records_confirm">Remove</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add new target dialog -->
-      <div class="modal fade" id="new_target_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="target_dialog_title">New Collection</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form id="target_form">
-                <div class="form-group row">
-                  <label for="recipient-name" class="col-sm-2 col-form-label">Name:</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" id="new_target_name">
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="message-text" class="col-sm-2 col-form-label">Address*:</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" id="new_target_address">
-                  </div>
-                </div>
-
-                <small id="passwordHelpInline" class="text-muted">
-                  *Optional, the related webpage address.
-                </small>
-
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="btn_add_target_confirm">Confirm</button>
-            </div>
-          </div>
-        </div>
+      <div id="target_foot">
+        <a id="btn_add_new_target" class="text-btn">
+          <i class="iconfont icon-folderplus"></i> <span>添加文件夹</span>
+        </a>
       </div>
 
     </div>
     <!-- target space end -->
 
-
     <div id="record_space">
-
-      <!-- <div id="target_space_header" class="space-header">
-            <a href="#" class="header-btn">[Clear]</a>
-          </div> -->
       <div class="template">
 
         <div class="record" id="record_template">
@@ -223,40 +119,7 @@
       <div class="editor" id="src_editor"></div>
       <div class="editor" id="des_editor"></div>
     </div>
-    <div class="preview" id="preview">
-      preview
-    </div>
-    <div id="side" class="ani">
-      <div id="mdguide">
-        <div class="side-head">Markdown Guide</div>
-        <div># Heading 1</div>
-        <div>## Heading 2</div>
-        <div>### Heading 3</div>
-        <div>#### H4</div>
-        <div>##### H5</div>
-        <div>###### H6</div>
-        <div>*** Divider</div>
-        <div>**Strong**</div>
-        <div>_Emphasis_</div>
-        <div>1. Ordered List</div>
-        <div>- Unordered L</div>
-        <div>> Block Quote</div>
-        <div>[Link]</div>
-        <div>![](Image)</div>
-        <div>`Code`</div>
-        <div>``` Code Block</div>
-      </div>
-
-      <!-- <div id="statistic">
-        <div class="side-head">Page Statistics</div>
-        <div>Words
-          <span id="word_count">243</span>
-        </div>
-        <div>Lines
-          <span id="line_count">34</span>
-        </div>
-      </div> -->
-    </div>
+    
   </div>
 
   <!-- <span id="btn_settings">Settings<i class="float-btn iconfont icon-settings" ></i></span> -->
