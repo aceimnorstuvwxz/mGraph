@@ -1,5 +1,5 @@
-
 <img src="mwriter/build/icon.png" style="margin-left: 45%;">
+
 # MWriter
 
 终极的支持插件的可定制的开源、免费的跨平台的markdown编辑器。
