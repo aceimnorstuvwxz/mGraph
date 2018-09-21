@@ -63,37 +63,22 @@ let g_editor_options = {
 
 function onModuleLoaded() {
   g_src_editor = monaco.editor.create(document.getElementById('src_editor'), g_editor_options)
-  g_des_editor = monaco.editor.create(document.getElementById('des_editor'), g_editor_options)
-
   on_editor_inited()
-
 }
 
-
-// let g_unmain_width_total = 400+100
-// function update_unmain_width_total(){
-//     g_unmain_width_total = $('#records_space').width() + $('#targets_space').width() + $('#side').width()
-// }
 let g_side_width = 0
 function update_editor_layout() {
-  // to fix editor can not auto width down
-  let unmain_width_total = $('#records_space').width() + $('#targets_space').width() +  g_side_width
-  let w = (window.innerWidth - unmain_width_total) / 2
+  let unmain_width_total = $('#records_space').width() + $('#targets_space').width() + g_side_width
+  let w = (window.innerWidth - unmain_width_total)
 
-  //below way, will cause too many time, so the screen will flash white
-  // let w = (window.innerWidth - $('#record_space').width - $('#target_space').width - $('#side').width)/2
-
-  if (g_src_editor && g_des_editor) {
+  if (g_src_editor) {
     g_src_editor.layout({ width: w, height: window.innerHeight - 30 })
-    g_des_editor.layout({ width: w, height: window.innerHeight - 30 })
   }
 }
 
 window.onresize = function (e) {
   update_editor_layout()
 }
-
-/* ui */
 
 document.addEventListener('DOMContentLoaded', function () {
   console.log("init window")
@@ -175,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
   //   if (store.get('mdguide', false)) {
   //     on_click_btn_mdguide()
   //   }
-    
+
   // }, 200)
 
   // setTimeout(function(){
@@ -332,11 +317,11 @@ function on_select_target(target) {
   console.log('click select element', target)
 
   if (g_selected_target_element == element) {
-      return
+    return
   }
 
   if (g_selected_target_element) {
-      g_selected_target_element.attr('select', 'false')
+    g_selected_target_element.attr('select', 'false')
   }
 
   element.attr('select', 'true')
@@ -350,27 +335,27 @@ function on_select_target(target) {
 
 let IMG_EXT_LIST = ['md', 'MD']
 function reload_target_records() {
-    let target = g_selected_target_element.web_target
-    console.log('reload target reocrds', target)
+  let target = g_selected_target_element.web_target
+  console.log('reload target reocrds', target)
 
-    if (!fs.existsSync(target)) {
-        alert(`${target} ${utils.lg('不存在', "doesn't exist")}`)
-        return
-    }
+  if (!fs.existsSync(target)) {
+    alert(`${target} ${utils.lg('不存在', "doesn't exist")}`)
+    return
+  }
 
 
-    fs.readdir(target, (err, files) => {
-        files.forEach(file => {
-            // console.log(file);
-            let ext = utils.get_file_ext(file)
-            if (IMG_EXT_LIST.indexOf(ext) != -1) {
-                //is image
-                add_new_record_element(file)
-            }
-        });
-        //TODO should check file is real file
-        //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
-    })
+  fs.readdir(target, (err, files) => {
+    files.forEach(file => {
+      // console.log(file);
+      let ext = utils.get_file_ext(file)
+      if (IMG_EXT_LIST.indexOf(ext) != -1) {
+        //is image
+        add_new_record_element(file)
+      }
+    });
+    //TODO should check file is real file
+    //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
+  })
 }
 
 function unselect_current_target() {
@@ -389,7 +374,6 @@ function unselect_current_record() {
     g_selected_record_element = null
 
     g_src_editor.setValue('')
-    g_des_editor.setValue('')
   }
 }
 
@@ -404,12 +388,12 @@ function on_click_new_target() {
   let folder_name = electron.remote.dialog.showOpenDialog({ properties: ['openDirectory'] })
   console.log(folder_name)
   if (folder_name && folder_name.length > 0) {
-      folder_name = folder_name[0]
-      if (mystore.get_targets().indexOf(folder_name) != -1) {
-          alert(utils.lg('这个文件夹早就被加入了', 'This folder has already been added'))
-      } else {
-          mystore.add_target(folder_name)
-      }
+    folder_name = folder_name[0]
+    if (mystore.get_targets().indexOf(folder_name) != -1) {
+      alert(utils.lg('这个文件夹早就被加入了', 'This folder has already been added'))
+    } else {
+      mystore.add_target(folder_name)
+    }
   }
 
   reload_targets()
@@ -423,7 +407,7 @@ function reload_targets() {
   g_target_map = {}
 
   targets.forEach(target => {
-      add_new_target_element(target)
+    add_new_target_element(target)
   })
 }
 
@@ -527,12 +511,34 @@ function add_new_record_element(record) {
   g_record_map[record] = new_element
   new_element.click(on_select_record.bind(null, record))
 
+  new_element.contextmenu(function (e) {
+    e.preventDefault()
+    const menu = new Menu()
+    menu.append(new MenuItem({ label: 'Rename', click: on_click_record_rename.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Remove', click: on_click_record_remove.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Pintop', click: on_click_record_toggle_pintop.bind(null, new_element) }))
+    menu.append(new MenuItem({ type: 'separator' }))
+
+    menu.append(new MenuItem({ label: 'New Note', click: on_click_new_record }))
+    menu.popup({ window: remote.getCurrentWindow() })
+  })
+}
+
+function on_click_record_rename(element) {
+
+}
+
+function on_click_record_remove(element) {
+
+}
+
+function on_click_record_toggle_pintop(element) {
+  
 }
 
 let g_selected_record_element = null
-function on_select_record(record_id) {
-  let element = g_record_map[record_id]
-  let record = element.web_record
+function on_select_record(record) {
+  let element = g_record_map[record]
 
   if (g_selected_record_element == element) {
     //same one, pass
@@ -549,56 +555,64 @@ function on_select_record(record_id) {
   element.attr('select', 'true')
   g_selected_record_element = element
 
-  //fetch detail record data
-  electron.ipcRenderer.send('get-record-data', record.id)
+  store.set('record', record)
 
-  store.set('record', record_id)
+  reload_record_data()
+}
+
+function get_current_record_file() {
+  if (g_selected_target_element && g_selected_record_element) {
+    let fn = path.join(g_selected_target_element.web_target, g_selected_record_element.web_record);
+    return fn;
+  } else {
+    return null;
+  }
+}
+
+function reload_record_data() {
+  let fn = get_current_record_file();
+  if (fn) {
+    fs.readFile(fn, (err, data) => {
+      if (err) {
+        alert(err)
+      } else {
+        let text = data.toString()
+        g_src_editor.setValue(text);
+        g_dirty = false
+      }
+    })
+  }
 }
 
 function on_click_new_record() {
-  //check if any target selected
-  if (g_selected_target_element == null) {
-    toastr.error('Please select a collection first')
-    return
-  }
 
-  electron.ipcRenderer.send('new-record', g_selected_target_element.web_target.id)
+  if (g_selected_target_element) {
+    let file_name = 'unamed-'+(Date.now()%10000) + '.md'
+    let new_fn = path.join(g_selected_target_element.web_target, file_name);
+    fs.writeFile(new_fn, 'new file', (err)=>{
+      toastr.info('new file')
+    })
+
+    add_new_record_element(file_name)
+  }
 }
 
-
-/* content */
-let g_current_record_data = null
-electron.ipcRenderer.on('record-data', function (e, data) {
-  console.log(data)
-  g_current_record_data = data
-
-  g_src_editor.setValue(data.src_text)
-  g_des_editor.setValue(data.des_text)
-  g_dirty = false
-
-})
-
 function on_click_save() {
-  console.log('do save')
-  if (g_current_record_data == null) {
-    toastr.info('Nothing to save')
-    return
-  }
-
   save_routine()
 }
 
 let g_dirty = false
 function save_routine() {
   console.log('save routine')
-  if (g_current_record_data && g_dirty) {
+  let fn = get_current_record_file()
+  if (fn && g_dirty) {
     g_dirty = false
-    g_current_record_data.src_text = g_src_editor.getValue()
-    g_current_record_data.des_text = g_des_editor.getValue()
-    electron.ipcRenderer.send('update-record-data', g_current_record_data)
-    console.log('saved')
+    fs.writeFile(fn, g_src_editor.getValue(), ()=>{
+      toastr.info('saved');
+    })
   }
 }
+
 window.onbeforeunload = function () {
   console.log("try save before close")
   save_routine()
@@ -806,8 +820,8 @@ electron.ipcRenderer.on('cmd-select-record', function (e, data) {
   $('#records_space').scrollTo(g_record_map[data])
 })
 
-electron.ipcRenderer.on('cmd-toggle-preview', function(e, data) {
-  if ($('#btn_markdown').attr('pressed') == "true"){
+electron.ipcRenderer.on('cmd-toggle-preview', function (e, data) {
+  if ($('#btn_markdown').attr('pressed') == "true") {
     on_click_btn_preview()
   } else {
     on_click_btn_markdown()
@@ -1020,8 +1034,8 @@ function on_click_toggle_targets() {
 
 function reset_target_space_width() {
   let flag = store.get('target_space', true)
-  $('#window_header').css('grid-template-columns', flag ? '150px 200px 1fr 1fr':'80px 120px 1fr 1fr')
-  $('#total').css('grid-template-columns', flag ? '150px 200px 1fr auto':'0px 200px 1fr auto')
+  $('#window_header').css('grid-template-columns', flag ? '150px 200px 1fr 1fr' : '80px 120px 1fr 1fr')
+  $('#total').css('grid-template-columns', flag ? '150px 200px 1fr auto' : '0px 200px 1fr auto')
   if (flag) {
     $('#show_icon').hide()
     $('#hide_icon').show()

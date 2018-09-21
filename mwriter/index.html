@@ -39,37 +39,8 @@
 
     </div>
     <div id="head_edit_src" class="head_segments">
-      <a class="btn-head btn-head-left" pressed="true" id="btn_markdown">
-        <i class="iconfont icon-markdown btn-head-icon"></i>
-      </a>
-
-      <a class="btn-head btn-head-right" pressed="false" id="btn_preview">
-        <i class="iconfont icon-imagetext btn-head-icon"></i>
-      </a>
     </div>
     <div id="head_edit" class="head_segments">
-
-      <div class="flex-push"></div>
-
-      <a class="btn-head">
-        <i class="iconfont icon-translate btn-head-icon" id="btn_translate"></i>
-      </a>
-
-      <a class="btn-head" id="btn_info">
-        <i class="iconfont icon-statistics btn-head-icon"></i>
-      </a>
-      <!-- 
-      <a class="btn-head">
-        <i class="iconfont icon-list btn-head-icon"></i>
-      </a> -->
-
-      <a class="btn-head" pressed="false" id="btn_mdguide">
-        <i class="iconfont icon-case btn-head-icon"></i>
-      </a>
-
-      <a class="btn-head" id="btn_export">
-        <i class="iconfont icon-share btn-head-icon"></i>
-      </a>
     </div>
   </div>
 
@@ -107,17 +78,12 @@
         </div>
       </div>
       <div id="record_list">
-
       </div>
 
-      <div id="fill_record_space">
-
-      </div>
     </div>
 
     <div id="editor_space">
       <div class="editor" id="src_editor"></div>
-      <div class="editor" id="des_editor"></div>
     </div>
     
   </div>
@@ -151,68 +117,6 @@
     require('./index.js')
   </script>
 
-
-
-  <div id="dialogs">
-
-    <!-- remove target records dialog -->
-    <div class="modal fade" id="article_info_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Article Statistics</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-
-
-            <div>
-              <span class="info-big" id="info_wc_src">234</span> Words,
-              <span class="info-big" id="info_pc_src">234</span> Lines in Source</div>
-            <div>
-              <span class="info-big" id="info_wc_des">234</span> Words,
-              <span class="info-big" id="info_pc_des">234</span> Lines in Result</div>
-
-            <div>Last Modification
-              <span class="info-med" id="info_edit_time">234</span>, Creation
-              <span class="info-med" id="info_create_time">234</span>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_delete_records_confirm">Got It</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- remove target dialog -->
-    <div class="modal fade" id="remove_record_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Remove Article</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            Are you sure to delete <span id="remove_record_name">MacRumors</span>?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="btn_remove_record_confirm">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-  </div>
 </body>
 
 </html>
