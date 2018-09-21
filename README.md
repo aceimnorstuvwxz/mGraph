@@ -1,4 +1,4 @@
-<img src="mwriter/build/icon.png" style="margin-left: 45%;">
+![](mwriter/build/icon.png)
 
 # MWriter
 
