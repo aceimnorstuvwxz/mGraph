@@ -1,5 +1,6 @@
-Langedit Project
+MWriter
 
-Inherited from OpenWebMonitor,
-In code target -> collection, record -> article, for fast developing!
+Ultimate free document writer for hackers only
 
+
+![](https://fate2.oss-cn-shanghai.aliyuncs.com/pool/20180921133022.png)
