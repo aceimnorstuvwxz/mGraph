@@ -160,8 +160,13 @@ function add_new_target_element(target) {
 }
 
 function on_click_remove_target(target_element) {
-  if (confirm('remove this folder?')) {
+  if (confirm('Remove this folder?')) {
     mystore.remove_target(target_element.web_target_path)
+    if (g_selected_target_element == target_element) {
+      unselect_current_record(clear=true)
+      unselect_current_target(clear=true)
+    }
+    delete g_target_map[target_element.web_target_path]
     target_element.remove()
   }
 }
@@ -225,11 +230,26 @@ function reload_target_records() {
   })
 }
 
-function unselect_current_record() {
+function unselect_current_record(clear=false) {
   if (g_selected_record_element) {
     g_dirty = false
     g_selected_record_element.attr('select', 'false')
     g_selected_record_element = null
+    if (clear) {
+      g_src_editor.setValue('')
+    }
+  }
+}
+
+function unselect_current_target(clear=false){
+  if (g_selected_target_element) {
+    g_selected_target_element.attr('select', 'false')
+    g_selected_target_element = null
+
+    if (clear) {
+      $('#record_list').empty()
+      g_record_map = {}
+    }
   }
 }
 
@@ -293,7 +313,7 @@ function add_new_record_element(full_path) {
   new_element.contextmenu(function (e) {
     e.preventDefault()
     const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Delete', click: on_click_record_remove.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Delete', click: on_click_record_delete.bind(null, new_element) }))
     menu.append(new MenuItem({ label: 'Open by External', click: on_click_open_record_external.bind(null, new_element) }))
     menu.append(new MenuItem({ type: 'separator' }))
 
@@ -304,8 +324,20 @@ function add_new_record_element(full_path) {
   new_element.dblclick(on_click_open_record_external.bind(null, new_element))
 }
 
-function on_click_record_remove(element) {
+function on_click_record_delete(element) {
+  if (confirm('delete this file?')) {
+    fs.unlink(element.web_record_path, (err)=>{
+      if (err) {
+        alert(err)
+      } else {
+        toastr.info('deleted')
+        if (element == g_selected_record_element) unselect_current_record(clear=true);
 
+        delete g_record_map[element.web_record_path];
+        element.remove()
+      }
+    })
+  }
 }
 
 function on_click_open_record_external(element) {
