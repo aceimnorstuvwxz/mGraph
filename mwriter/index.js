@@ -39,7 +39,7 @@ let g_editor_options = {
   language: 'markdown',
   automaticLayout: true,
   theme: "vs-light",
-  lineNumbers: "on",
+  lineNumbers: "off",
   fontFamily: "Menlo",
   fontSize: 14,
   wordWrap: 'on',
@@ -47,7 +47,7 @@ let g_editor_options = {
   formatOnPaste: true,
   glyphMargin: false,
   minimap: {
-    enabled: false
+    enabled: true
   },
   lineNumbersMinChars: 2,
   scrollBeyondLastLine: false,
@@ -92,24 +92,24 @@ document.addEventListener('DOMContentLoaded', function () {
   console.log("init window")
   locale.init()
 
-  /*
+ 
   toastr.options = {
     "closeButton": false,
     "debug": false,
     "newestOnTop": false,
     "progressBar": false,
-    "positionClass": "toast-bottom-center",
+    // "positionClass": "toast-bottom-center",
     "preventDuplicates": false,
     "onclick": null,
     "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "5000",
+    "hideDuration": "5000",
+    "timeOut": "2000",
     "extendedTimeOut": "1000",
     "showEasing": "swing",
     "hideEasing": "linear",
     "showMethod": "fadeIn",
     "hideMethod": "fadeOut"
-  }*/
+  }
 
 
   $('#btn_add_new_target').click(on_click_new_target)
@@ -639,43 +639,43 @@ function init_context_acions() {
   })
 
   // google
-  g_src_editor.addAction({
-    id: 'myact-search',
-    label: 'Google It',
-    precondition: null,
-    keybindingContext: null,
-    contextMenuGroupId: 'navigation',
-    contextMenuOrder: 1.5,
-    run: function (ed) {
-      let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
-      console.log('selected', selected_text)
+  // g_src_editor.addAction({
+  //   id: 'myact-search',
+  //   label: 'Google It',
+  //   precondition: null,
+  //   keybindingContext: null,
+  //   contextMenuGroupId: 'navigation',
+  //   contextMenuOrder: 1.5,
+  //   run: function (ed) {
+  //     let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
+  //     console.log('selected', selected_text)
 
-      utils.google(selected_text)
-      return null;
-    }
-  })
+  //     utils.google(selected_text)
+  //     return null;
+  //   }
+  // })
 
   // translate to clipboard
 
-  g_src_editor.addAction({
-    id: 'myact-translate',
-    label: 'Copy and Translate',
-    precondition: null,
-    keybindingContext: null,
-    contextMenuGroupId: 'navigation',
-    contextMenuOrder: 1.6,
-    run: function (ed) {
-      let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
-      console.log('selected', selected_text)
+  // g_src_editor.addAction({
+  //   id: 'myact-translate',
+  //   label: 'Translate',
+  //   precondition: null,
+  //   keybindingContext: null,
+  //   contextMenuGroupId: 'navigation',
+  //   contextMenuOrder: 1.6,
+  //   run: function (ed) {
+  //     let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
+  //     console.log('selected', selected_text)
 
-      g_translating_src_lines = selected_text.split('\n')
-      g_translating_line_index = 0
-      g_translating_is_for_all = false
-      g_translating_for_copy_cache = ''
-      trans_next_line()
-      return null;
-    }
-  })
+  //     g_translating_src_lines = selected_text.split('\n')
+  //     g_translating_line_index = 0
+  //     g_translating_is_for_all = false
+  //     g_translating_for_copy_cache = ''
+  //     trans_next_line()
+  //     return null;
+  //   }
+  // })
 }
 
 /* cmd */

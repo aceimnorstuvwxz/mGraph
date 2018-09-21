@@ -237,7 +237,7 @@ function createMainWindow() {
       webPreferences: { webSecurity: true },
       width: store.get('width', 1400),
       height: store.get('height', 600),
-      // titleBarStyle: 'hidden'
+      titleBarStyle: 'hidden'
     })
 
     mainWindow.loadURL(url.format({

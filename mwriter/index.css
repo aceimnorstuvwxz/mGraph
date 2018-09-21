@@ -1,13 +1,4 @@
 :root {
-    --system-theme-color:#ffa600;
-    --system-indication-color:#e84a5f;
-    --system-bg1-color: #eeeeee;
-    --system-bg-color: #f0f0f0;
-    --system-split-color: #d4d4d4;
-    --system-hover-color: rgb(216, 216, 216);
-    --system-active-color: rgb(200, 219, 219);
-
-    --system-base-color: rgb(244,242,243);
   }
 
 * {
@@ -23,12 +14,13 @@ a{
     user-select: none;
     cursor: default;
 }
+
 .ani{
     transition: all 0.2s ease-in-out; 
 }
 
 body{
-    background-color: var(--system-base-color);
+    background-color: rgb(244,242,243);
     color: #333;
     display: grid;
     grid-template-rows: 30px 1fr;
@@ -51,10 +43,10 @@ html, body{
 /* header space */
 
 #window_header{
-    border-bottom: 1px solid var(--system-split-color);
+    border-bottom: 1px solid #d4d4d4;
     display: grid;
     grid-template-columns: 100px 120px 1fr 1fr;
-    border-bottom: 1px var(--system-split-color) solid;
+    background: #fffcf8;
 }
 
 .btn-head{
@@ -113,6 +105,7 @@ html, body{
 #record_space{
     height: 100%;
     border-right: 1px solid rgb(216, 216, 216);
+    background: rgb(245, 242, 240);
 }
 
 #editor_space{
@@ -141,7 +134,6 @@ html, body{
     overflow: scroll;
 }
 
-
 .text-btn{
     font-size: 12px;
 }
@@ -150,7 +142,6 @@ html, body{
     cursor: pointer;
     padding: 3px 15px;
     color: black;
-    font-size: 16px;
 }
 
 .target[select="true"]{
