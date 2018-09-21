@@ -276,7 +276,7 @@ function on_select_target(target_path) {
   store.set('last-target-path', target_path)
 }
 
-let IMG_EXT_LIST = ['md', 'MD']
+let SUPPORTED_EXT_LIST = ['md', 'MD', 'txt', 'TXT']
 function reload_target_records() {
   let target = g_selected_target_element.web_target_path
   console.log('reload target reocrds', target)
@@ -290,7 +290,7 @@ function reload_target_records() {
     files.forEach(file => {
       // console.log(file);
       let ext = utils.get_file_ext(file)
-      if (IMG_EXT_LIST.indexOf(ext) != -1) {
+      if (SUPPORTED_EXT_LIST.indexOf(ext) != -1) {
         //is image
         let tmp_full_path = path.join(target,file);
         add_new_record_element(tmp_full_path);
@@ -519,6 +519,7 @@ function on_click_new_record() {
     })
 
     add_new_record_element(new_fn)
+    on_select_record(g_record_map[new_fn])
   }
 }
 
@@ -568,7 +569,7 @@ function fetch_file_name(data) {
   } else {
     fn = rmmd.rmmd(data, nd=true)
   }
-  if (!fn.toLowerCase().endsWith('.md')) {
+  if (SUPPORTED_EXT_LIST.indexOf(fn.toLowerCase())!=-1) {
     fn = fn + '.md'
   }
   return fn;
