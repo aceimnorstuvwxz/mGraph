@@ -32,7 +32,6 @@ amdRequire(['vs/editor/editor.main'], () => {
 })
 
 let g_src_editor = null
-let g_des_editor = null
 
 let g_editor_options = {
   value: [
@@ -103,75 +102,18 @@ document.addEventListener('DOMContentLoaded', function () {
     "hideMethod": "fadeOut"
   }*/
 
-  electron.ipcRenderer.send('get-all-targets')
 
   $('#btn_add_new_target').click(on_click_new_target)
-  $('#btn_add_target_confirm').click(on_click_btn_add_new_target_confirm)
-  $('#btn_remove_target_confirm').click(on_click_remove_target_confirm)
-  $('#btn_remove_record_confirm').click(on_click_remove_record_confirm)
-
   $('#btn_add_record').click(on_click_new_record)
-
-  $('#records_space').scroll(function (e) {
-    // console.log(e.target.scrollTop, $(window).height(), e.target.clientHeight, $('#record_list').height())
-    if (g_selected_target_nomore_record == false && g_record_more_loading == false && e.target.scrollTop + $(window).height() >= $('#record_list').height() - 50) {
-      g_record_more_loading = true
-      console.log('get more record')
-      electron.ipcRenderer.send('get-some-records', { target_id: g_selected_target_element.web_target.id, offset: $('.record').length - 1 }) //offset remove template
-
-    }
-  })
-
-  $('#fill_target_space').contextmenu(function (e) {
-    e.preventDefault()
-    const menu = new Menu()
-    menu.append(new MenuItem({ label: 'New Collection', click: on_click_new_target }))
-    menu.popup({ window: remote.getCurrentWindow() })
-  })
-
-
-  $('#fill_record_space').contextmenu(function (e) {
-    e.preventDefault()
-    const menu = new Menu()
-    menu.append(new MenuItem({ label: 'New Record', click: on_click_new_record }))
-    menu.popup({ window: remote.getCurrentWindow() })
-  })
 
   setInterval(update_moment_time, 30 * 1000)
 
   $('#btn_dev').click(on_click_dev_test)
-  $('#btn_translate').click(on_click_translate)
-
-  $('#btn_markdown').click(on_click_btn_markdown)
-  $('#btn_preview').click(on_click_btn_preview)
-  $('#btn_mdguide').click(on_click_btn_mdguide)
-  $('#btn_info').click(on_click_on_info)
   $('#btn_toggle_targets').click(on_click_toggle_targets)
 
   setInterval(save_routine, 30 * 1000)
 
-
-  // setTimeout(function(){
-  //   let t = store.get('target')
-  //   if (t) {
-  //     on_select_target(t)
-  //   }
-
-  //   if (store.get('mdguide', false)) {
-  //     on_click_btn_mdguide()
-  //   }
-
-  // }, 200)
-
-  // setTimeout(function(){
-  //   let t = store.get('record')
-  //   if (t) {
-  //     on_select_record(t)
-  //   }
-  // }, 500)
-
   reset_target_space_width()
-
 
   reload_targets();
 })
@@ -350,7 +292,8 @@ function reload_target_records() {
       let ext = utils.get_file_ext(file)
       if (IMG_EXT_LIST.indexOf(ext) != -1) {
         //is image
-        add_new_record_element(file)
+        let tmp_full_path = path.join(target,file);
+        add_new_record_element(tmp_full_path);
       }
     });
     //TODO should check file is real file
@@ -462,25 +405,6 @@ function on_click_btn_add_new_target_confirm() {
 
 }
 
-/* records */
-
-electron.ipcRenderer.on('new-record', function (e, data) {
-  add_new_record_element(data, true)
-
-  on_select_record(data.id)
-})
-
-electron.ipcRenderer.on('some-records', function (e, records) {
-  console.log('all records', records)
-  records.forEach(function (record) {
-    add_new_record_element(record)
-  })
-  g_record_more_loading = false
-  if (records.length == 0) {
-    g_selected_target_nomore_record = true
-    console.log('no more records')
-  }
-})
 
 let g_record_map = {}
 function right_showing_title(record) {
@@ -499,24 +423,28 @@ function right_showing_desc(record) {
   return t
 }
 
-function add_new_record_element(record) {
+function refresh_record_ui(record_element) {
+  //根据他的web_path指向的文件
+  record_element.find('.record-name').text(record_element.web_path.split(path.sep).pop())
+}
+
+function add_new_record_element(full_path) {
 
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
-  new_element.find('.record-name').text(record)
-
-  new_element.web_record = record
+  new_element.web_path = full_path
   new_element.appendTo('#record_list')
+  g_record_map[full_path] = new_element
 
-  g_record_map[record] = new_element
-  new_element.click(on_select_record.bind(null, record))
+  refresh_record_ui(new_element)
+
+  new_element.click(on_select_record.bind(null, new_element))
 
   new_element.contextmenu(function (e) {
     e.preventDefault()
     const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Rename', click: on_click_record_rename.bind(null, new_element) }))
-    menu.append(new MenuItem({ label: 'Remove', click: on_click_record_remove.bind(null, new_element) }))
-    menu.append(new MenuItem({ label: 'Pintop', click: on_click_record_toggle_pintop.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Delete', click: on_click_record_remove.bind(null, new_element) }))
+    // menu.append(new MenuItem({ label: 'Pintop', click: on_click_record_toggle_pintop.bind(null, new_element) }))
     menu.append(new MenuItem({ type: 'separator' }))
 
     menu.append(new MenuItem({ label: 'New Note', click: on_click_new_record }))
@@ -533,12 +461,13 @@ function on_click_record_remove(element) {
 }
 
 function on_click_record_toggle_pintop(element) {
-  
+
 }
 
 let g_selected_record_element = null
-function on_select_record(record) {
-  let element = g_record_map[record]
+function on_select_record(record_element) {
+
+  let element = record_element;
 
   if (g_selected_record_element == element) {
     //same one, pass
@@ -555,15 +484,13 @@ function on_select_record(record) {
   element.attr('select', 'true')
   g_selected_record_element = element
 
-  store.set('record', record)
 
   reload_record_data()
 }
 
 function get_current_record_file() {
-  if (g_selected_target_element && g_selected_record_element) {
-    let fn = path.join(g_selected_target_element.web_target, g_selected_record_element.web_record);
-    return fn;
+  if (g_selected_record_element) {
+    return g_selected_record_element.web_path;
   } else {
     return null;
   }
@@ -587,13 +514,13 @@ function reload_record_data() {
 function on_click_new_record() {
 
   if (g_selected_target_element) {
-    let file_name = 'unamed-'+(Date.now()%10000) + '.md'
+    let file_name = 'unamed-' + (Date.now() % 10000) + '.md'
     let new_fn = path.join(g_selected_target_element.web_target, file_name);
-    fs.writeFile(new_fn, 'new file', (err)=>{
+    fs.writeFile(new_fn, '@' + file_name, (err) => {
       toastr.info('new file')
     })
 
-    add_new_record_element(file_name)
+    add_new_record_element(new_fn)
   }
 }
 
@@ -604,13 +531,49 @@ function on_click_save() {
 let g_dirty = false
 function save_routine() {
   console.log('save routine')
-  let fn = get_current_record_file()
-  if (fn && g_dirty) {
+  let fn_curr = get_current_record_file()
+  if (fn_curr && g_dirty) {
     g_dirty = false
-    fs.writeFile(fn, g_src_editor.getValue(), ()=>{
-      toastr.info('saved');
+    let tmp_data = g_src_editor.getValue()
+    let new_filename = fetch_file_name(tmp_data)
+    console.log('gen fn', new_filename)
+    let tmp_fn = path.join(g_selected_target_element.web_target, new_filename)
+    fs.writeFile(fn_curr, tmp_data, (err) => {
+      if (err) {
+        alert(err)
+      } else {
+        toastr.info('saved');
+
+      if (tmp_fn != fn_curr) {
+        //需要重命名
+        fs.rename(fn_curr, tmp_fn, (err)=>{
+          if (err){
+            alert(err)
+          } else {
+            toastr.info('renamed');
+            g_selected_record_element.web_path = tmp_fn;
+            refresh_record_ui(g_selected_record_element);
+          }
+        })
+      }
+      }
     })
+
   }
+}
+
+function fetch_file_name(data) {
+  let first_line = data.split('\n')[0]
+  let fn = ''
+  if (first_line.startsWith('@')) {
+    fn = first_line.slice(1)
+  } else {
+    fn = rmmd.rmmd(data, nd=true)
+  }
+  if (!fn.toLowerCase().endsWith('.md')) {
+    fn = fn + '.md'
+  }
+  return fn;
 }
 
 window.onbeforeunload = function () {
@@ -659,58 +622,20 @@ function on_editor_inited() {
         let top2 = find_top_2_filled_line(src_model)
         let new_title = rmmd.rmmd(notnull(top2[0]), true)
         let new_desc = rmmd.rmmd(notnull(top2[1]), true)
-        if (g_current_record_data.src_title != new_title) {
-          g_current_record_data.src_title = new_title
-          on_selected_record_title_data_changed()
-        }
-        if (g_current_record_data.src_desc != new_desc) {
-          g_current_record_data.src_desc = new_desc
-          on_selected_record_desc_data_changed()
-        }
-      }
-    })
-  })
-
-  let des_model = g_des_editor.getModel()
-  des_model.onDidChangeContent(function (e) {
-
-    if (g_selected_record_element == null) {
-      return
-    }
-    g_dirty = true
-
-    e.changes.forEach(function (change) {
-      if (change.range.startLineNumber < 5) {
-        let top2 = find_top_2_filled_line(des_model)
-        let new_title = rmmd.rmmd(notnull(top2[0]), true)
-        let new_desc = rmmd.rmmd(notnull(top2[1]), true)
-        if (g_current_record_data.des_title != new_title) {
-          g_current_record_data.des_title = new_title
-          on_selected_record_title_data_changed()
-        }
-        if (g_current_record_data.des_desc != new_desc) {
-          g_current_record_data.des_desc = new_desc
-          on_selected_record_desc_data_changed()
-        }
+        // if (g_current_record_data.src_title != new_title) {
+        //   g_current_record_data.src_title = new_title
+        //   on_selected_record_title_data_changed()
+        // }
+        // if (g_current_record_data.src_desc != new_desc) {
+        //   g_current_record_data.src_desc = new_desc
+        //   on_selected_record_desc_data_changed()
+        // }
       }
     })
   })
 
   init_context_acions()
 
-  // scroll sync
-  $('#src_editor').click(function () {
-    if (!g_des_editor.isFocused()) {
-      g_des_editor.revealLineInCenterIfOutsideViewport(g_src_editor.getPosition().lineNumber)
-      g_des_editor.setSelection(g_src_editor.getSelection())
-    }
-  })
-  $('#des_editor').click(function () {
-    if (!g_src_editor.isFocused()) {
-      g_src_editor.revealLineInCenterIfOutsideViewport(g_des_editor.getPosition().lineNumber)
-      g_src_editor.setSelection(g_des_editor.getSelection())
-    }
-  })
 }
 
 function init_context_acions() {
@@ -749,22 +674,6 @@ function init_context_acions() {
     }
   })
 
-  g_des_editor.addAction({
-    id: 'myact-search',
-    label: 'Google It',
-    precondition: null,
-    keybindingContext: null,
-    contextMenuGroupId: 'navigation',
-    contextMenuOrder: 1.5,
-    run: function (ed) {
-      let selected_text = g_des_editor.getModel().getValueInRange(g_des_editor.getSelection())
-      console.log('selected', selected_text)
-
-      utils.google(selected_text)
-      return null;
-    }
-  })
-
   // translate to clipboard
 
   g_src_editor.addAction({
@@ -787,15 +696,6 @@ function init_context_acions() {
     }
   })
 }
-
-function on_selected_record_title_data_changed() {
-  g_selected_record_element.find('.record-title').text(right_showing_title(g_current_record_data))
-}
-
-function on_selected_record_desc_data_changed() {
-  g_selected_record_element.find('.record-desc').text(right_showing_desc(g_current_record_data))
-}
-
 
 /* cmd */
 electron.ipcRenderer.on('cmd-new-target', function (e, data) {
@@ -876,13 +776,6 @@ function on_click_translate() {
     return
   }
 
-  // clear des, can undo
-  g_des_editor.executeEdits("", [
-    {
-      range: g_des_editor.getModel().getFullModelRange(),
-      text: ''
-    }
-  ])
 
   // translate in lines
   g_translating_src_lines = g_src_editor.getModel().getLinesContent()
@@ -937,42 +830,6 @@ function trans_next_line() {
   })
 }
 
-function on_line_translate_end(line_translate_result) {
-
-  g_translating_line_index += 1
-  if (g_translating_is_for_all) {
-    g_src_editor.revealLine(g_translating_line_index)
-    g_des_editor.revealLine(g_translating_line_index)
-
-    let end_range = g_des_editor.getModel().getFullModelRange()
-    end_range.startColumn = end_range.endColumn
-    end_range.startLineNumber = end_range.endLineNumber
-
-    g_des_editor.executeEdits("", [
-      {
-        range: end_range,
-        text: line_translate_result + '\n'
-      }
-    ])
-  } else {
-    g_translating_for_copy_cache += line_translate_result
-  }
-
-  if (g_translating_line_index == g_translating_src_lines.length) {
-    // translating done
-    g_translating_src_lines = null
-    g_translating_line_index = -1
-    if (!g_translating_is_for_all) {
-      electron.clipboard.writeText(g_translating_for_copy_cache)
-      g_translating_for_copy_cache = ''
-    }
-    console.log('translating done')
-  } else {
-    trans_next_line()
-  }
-
-}
-
 function on_click_btn_markdown() {
   $('#btn_markdown').attr('pressed', 'true')
   $('#btn_preview').attr('pressed', 'false')
@@ -981,19 +838,6 @@ function on_click_btn_markdown() {
   $('#preview').hide()
 }
 
-function on_click_btn_preview() {
-  $('#btn_markdown').attr('pressed', 'false')
-  $('#btn_preview').attr('pressed', 'true')
-
-  $('#preview').html(markdown.toHTML(g_des_editor.getValue()))
-
-  $('#preview a').each(function (index, element) {
-    $(element).attr('target', '_blank')
-  })
-
-  $('#editor_space').hide()
-  $('#preview').show()
-}
 
 function on_click_btn_mdguide() {
   if ($('#btn_mdguide').attr('pressed') == 'true') {
@@ -1013,19 +857,6 @@ function on_click_btn_mdguide() {
   }
 }
 
-function on_click_on_info() {
-
-  $('#info_wc_src').text('' + wc(g_src_editor.getValue()))
-  $('#info_wc_des').text('' + wc(g_des_editor.getValue()))
-
-  $('#info_pc_src').text('' + g_src_editor.getModel().getLineCount())
-  $('#info_pc_des').text('' + g_des_editor.getModel().getLineCount())
-
-  $('#info_create_time').text(moment.unix(g_current_record_data.create_time / 1000).fromNow())
-  $('#info_edit_time').text(moment.unix(g_current_record_data.edit_time / 1000).fromNow())
-
-  $('#article_info_dialog').modal('show')
-}
 
 function on_click_toggle_targets() {
   store.set('target_space', !store.get('target_space', true))
