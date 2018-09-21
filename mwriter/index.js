@@ -122,8 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
 let g_is_target_new = true
 let g_under_config_target_element = null
 let g_target_map = {}
-let g_selected_target_nomore_record = false //是否当前的target已经没有可以下滑加载的更多的record了
-let g_record_more_loading = false //防止大量的record加载
 function add_new_target_element(target) {
   let new_element = $('#target_template').clone()
   new_element.removeAttr('id')
@@ -141,25 +139,27 @@ function add_new_target_element(target) {
   new_element.contextmenu(function (e) {
     e.preventDefault()
     const menu = new Menu()
-    menu.append(new MenuItem({ label: 'Edit', click: on_click_config_target.bind(null, new_element) }))
     menu.append(new MenuItem({ label: 'Remove', click: on_click_remove_target.bind(null, new_element) }))
-    menu.append(new MenuItem({ label: 'View Address', click: on_click_open_in_browser.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Reveal in Finder', click: on_reveal_in_finder.bind(null, new_element) }))
     menu.append(new MenuItem({ type: 'separator' }))
 
     menu.append(new MenuItem({ label: 'New Collection', click: on_click_new_target }))
     menu.popup({ window: remote.getCurrentWindow() })
   })
+
+  new_element.dblclick(on_reveal_in_finder.bind(null, new_element))
+
 }
 
-function on_click_open_in_browser(target_element) {
-  electron.remote.shell.openExternal(target_element.web_target.address)
-}
-
-let g_under_removing_target_element = null
 function on_click_remove_target(target_element) {
-  g_under_removing_target_element = target_element
-  $('#remove_target_dialog').find('#remove_target_name').text(target_element.web_target.name)
-  $('#remove_target_dialog').modal('show')
+  if (confirm('remove this folder?')) {
+    mystore.remove_target(target_element.web_target)
+    target_element.remove()
+  }
+}
+
+function on_reveal_in_finder(target_element) {
+  electron.remote.shell.openItem(target_element.web_target);
 }
 
 let g_under_deleting_record_element = null
@@ -444,12 +444,14 @@ function add_new_record_element(full_path) {
     e.preventDefault()
     const menu = new Menu()
     menu.append(new MenuItem({ label: 'Delete', click: on_click_record_remove.bind(null, new_element) }))
-    // menu.append(new MenuItem({ label: 'Pintop', click: on_click_record_toggle_pintop.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Open by External', click: on_click_open_record_external.bind(null, new_element) }))
     menu.append(new MenuItem({ type: 'separator' }))
 
     menu.append(new MenuItem({ label: 'New Note', click: on_click_new_record }))
     menu.popup({ window: remote.getCurrentWindow() })
   })
+
+  new_element.dblclick(on_click_open_record_external.bind(null, new_element))
 }
 
 function on_click_record_rename(element) {
@@ -458,6 +460,9 @@ function on_click_record_rename(element) {
 
 function on_click_record_remove(element) {
 
+}
+function on_click_open_record_external(element) {
+  electron.remote.shell.openItem(element.web_path);
 }
 
 function on_click_record_toggle_pintop(element) {
