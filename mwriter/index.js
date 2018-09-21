@@ -130,8 +130,6 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 /* targets */
-let g_is_target_new = true
-let g_under_config_target_element = null
 let g_target_map = {}
 function add_new_target_element(target) {
   let new_element = $('#target_template').clone()
@@ -171,81 +169,6 @@ function on_click_remove_target(target_element) {
 function on_reveal_in_finder(target_element) {
   electron.remote.shell.openItem(target_element.web_target_path);
 }
-
-let g_under_deleting_record_element = null
-function on_click_remove_record(record_element) {
-  g_under_deleting_record_element = record_element
-
-  $('#remove_record_dialog').find('#remove_record_name').text(right_showing_title(record_element.web_record))
-  $('#remove_record_dialog').modal('show')
-}
-
-let g_under_delete_records_element = null
-function on_click_delete_records(target_element) {
-  g_under_delete_records_element = target_element
-  $('#delete_records_dialog').find('#delete_records_target_name').text(target_element.web_target_path.name)
-  $('#delete_records_dialog').modal('show')
-}
-
-function on_click_mark_all_read(target_element) {
-  if (g_selected_target_element == target_element) {
-    $('.record').find('.record-indication').attr('type', '1')
-  }
-
-  target_element.find('.target-indication').attr('indication', 'false')
-
-  electron.ipcRenderer.send('mark-all-read', target_element.web_target_path.id)
-}
-
-function on_click_remove_record_confirm() {
-  $('#remove_record_dialog').modal('hide')
-
-  if (g_under_deleting_record_element == g_selected_record_element) {
-    unselect_current_record()
-  }
-
-  g_under_deleting_record_element.remove()
-  electron.ipcRenderer.send('remove-record', g_under_deleting_record_element.web_record.id)
-  g_under_deleting_record_element = null
-}
-
-function on_click_delete_records_confirm() {
-  $('#delete_records_dialog').modal('hide')
-  $('#record_list').empty()
-  electron.ipcRenderer.send('delete-records', g_under_delete_records_element.web_target_path.id)
-  g_under_delete_records_element = null
-}
-
-function on_click_toggle_pause_target(target_element) {
-  console.log('click pause/resume target')
-  target_element.web_target_path.state = target_element.web_target_path.state == utils.TARGET_STATE.NORMAL ? utils.TARGET_STATE.PAUSED : utils.TARGET_STATE.NORMAL
-  target_element.find('.target-paused').attr('paused', target_element.web_target_path.state == utils.TARGET_STATE.NORMAL ? "false" : "true")
-  electron.ipcRenderer.send('set-target-state', { target_id: target_element.web_target_path.id, state: target_element.web_target_path.state })
-}
-
-function on_click_toggle_mute_target(target_element) {
-  console.log('click mute/unmute target')
-  target_element.web_target_path.muted = target_element.web_target_path.muted == 0 ? 1 : 0
-  target_element.find('.target-muted').attr('muted', target_element.web_target_path.muted == 0 ? "false" : "true")
-  electron.ipcRenderer.send('set-target-muted', { target_id: target_element.web_target_path.id, state: target_element.web_target_path.muted })
-}
-
-electron.ipcRenderer.on('new-target', function (e, target) {
-  console.log('new target', target)
-  add_new_target_element(target)
-})
-
-electron.ipcRenderer.on('all-targets', function (e, data) {
-  console.log('all targets', data)
-  data.targets.forEach((target, index) => {
-    add_new_target_element(target)
-  })
-})
-
-electron.ipcRenderer.on('new-target-icon', function (e, data) {
-  console.log('new-target-icon', data)
-  g_target_map[data.target_id].find('.target-image').attr('src', data.icon)
-})
 
 let g_selected_target_element = null
 
@@ -348,74 +271,7 @@ function reload_targets() {
 
 }
 
-function on_click_config_target(target_element) {
-  g_is_target_new = false
-  g_under_config_target_element = target_element
-  $('#target_dialog_title').text('Edit Collection')
-
-  $('#new_target_name').val(target_element.web_target_path.name)
-  $('#new_target_address').val(target_element.web_target_path.address)
-
-  $('#new_target_dialog').modal('show')
-}
-
-function on_click_btn_add_new_target_confirm() {
-  let name = $('#new_target_name').val()
-  let address = $('#new_target_address').val()
-
-  if (name.length == 0) {
-    toastr["error"]("Name is required")
-    return
-  }
-
-  if (address.length > 0) {
-    address += '    '
-    if (address.slice(0, 4).toLowerCase() != 'http') {
-      address = 'http://' + address
-    }
-  }
-
-  address = address.trim()
-
-  $('#new_target_dialog').modal('hide')
-  if (g_is_target_new) {
-    electron.ipcRenderer.send('new-target', {
-      name: name,
-      address: address,
-    })
-  } else {
-    electron.ipcRenderer.send('update-target', {
-      id: g_under_config_target_element.web_target_path.id,
-      name: name,
-      address: address,
-    })
-
-    g_under_config_target_element.find('.target-name').text(name)
-    g_under_config_target_element.find('.target-address').text(address)
-    g_under_config_target_element.web_target_path.address = address
-    g_under_config_target_element.web_target_path.name = name
-
-  }
-
-}
-
-
 let g_record_map = {}
-function right_showing_title(record) {
-  let t = record.des_title.length > 0 ? record.des_title : record.src_title
-  if (t.length == 0) {
-    t = "Empty"
-  }
-  return t
-}
-
-function right_showing_desc(record) {
-  let t = record.des_desc.length > 0 ? record.des_desc : record.src_desc
-  if (t.length == 0) {
-    t = "no description"
-  }
-  return t
-}
 
 function refresh_record_ui(record_element) {
   //根据他的web_record_path指向的文件
@@ -448,13 +304,10 @@ function add_new_record_element(full_path) {
   new_element.dblclick(on_click_open_record_external.bind(null, new_element))
 }
 
-function on_click_record_rename(element) {
-
-}
-
 function on_click_record_remove(element) {
 
 }
+
 function on_click_open_record_external(element) {
   electron.remote.shell.openItem(element.web_record_path);
 }
@@ -732,102 +585,6 @@ function on_paste_as_markdown(editor) {
     { range: editor.getSelection(), text: markdown }
   ])
 }
-
-let g_translating_src_lines = null
-let g_translating_line_index = 0
-let g_translating_in_code = false
-let g_translating_is_for_all = false
-let g_translating_for_copy_cache = ''
-function on_click_translate() {
-
-  // because of undo, no need of check if des has data
-
-  if (g_selected_record_element == null) {
-    // no selected
-    return
-  }
-
-
-  // translate in lines
-  g_translating_src_lines = g_src_editor.getModel().getLinesContent()
-  g_translating_line_index = 0
-  g_translating_is_for_all = true
-  trans_next_line()
-}
-
-function trans_next_line() {
-  let target_line = g_translating_src_lines[g_translating_line_index]
-
-  // check empty line
-  if (target_line.trim().length == 0) {
-    on_line_translate_end('')
-    return
-  }
-
-  // retain code block
-  if (target_line.includes('```') || target_line.includes('~~~')) {
-    g_translating_in_code = !g_translating_in_code
-    on_line_translate_end(target_line)
-    return
-  } else if (g_translating_in_code) {
-    on_line_translate_end(target_line)
-    return
-  }
-
-  let unmarked = rmmd.rmmd(target_line).split(rmmd.SP)
-
-  unmarked.filter((v) => v.length > 0)
-
-  let trans_count = 0
-
-  unmarked.forEach(function (segment) {
-    if (segment.startsWith(rmmd.UN)) {
-      // inline code, not translate
-      trans_count += 1
-      if (trans_count == unmarked.length) {
-        on_line_translate_end(target_line)
-      }
-    } else {
-      trans.translate2cn(segment, function (tred_text) {
-        console.log(tred_text)
-        tred_text = tred_text ? tred_text.to_text : segment
-        target_line = target_line.replace(segment, tred_text)
-        trans_count += 1
-        if (trans_count == unmarked.length) {
-          on_line_translate_end(target_line)
-        }
-      })
-    }
-  })
-}
-
-function on_click_btn_markdown() {
-  $('#btn_markdown').attr('pressed', 'true')
-  $('#btn_preview').attr('pressed', 'false')
-
-  $('#editor_space').show()
-  $('#preview').hide()
-}
-
-
-function on_click_btn_mdguide() {
-  if ($('#btn_mdguide').attr('pressed') == 'true') {
-    $('#btn_mdguide').attr('pressed', 'false')
-    $('#side').hide()
-    g_side_width = 0
-    update_editor_layout()
-    store.set('mdguide', false)
-    $('#btn_export').css('margin-right', '1px') //work round!!
-  } else {
-    $('#btn_mdguide').attr('pressed', 'true')
-    $('#side').show()
-    g_side_width = $('#side').width()
-    update_editor_layout()
-    store.set('mdguide', true)
-    $('#btn_export').css('margin-right', '9px') //work round!!
-  }
-}
-
 
 function on_click_toggle_targets() {
   store.set('target_space', !store.get('target_space', true))

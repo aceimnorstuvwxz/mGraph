@@ -60,14 +60,13 @@ function get_menu_template() {
       label: lg('文件', 'File'),
       submenu: [
         {
-          label: lg('新文集', 'New Collection'),
-          // accelerator: 'CmdOrCtrl+N',
+          label: lg('添加文件夹', 'Add Forder'),
           click() {
             main_utils.notify_all_windows('cmd-new-target')
           }
         },
         {
-          label: lg('新文章', 'New Article'),
+          label: lg('新建文件', 'New File'),
           accelerator: 'CmdOrCtrl+N',
           click() {
             main_utils.notify_all_windows('cmd-new-record')
@@ -102,8 +101,8 @@ function get_menu_template() {
         { role: 'resetzoom', label: lg('重置缩放', 'Reset Zoom') },
         { type: 'separator' },
         { role: 'togglefullscreen', label: lg('切换全屏', 'Toggle Fun Screen') },
-        { label: 'Toggle Preview', accelerator: 'CommandOrControl+p',
-          click(){  main_utils.notify_all_windows('cmd-toggle-preview') }}
+        // { label: 'Toggle Preview', accelerator: 'CommandOrControl+p',
+        //   click(){  main_utils.notify_all_windows('cmd-toggle-preview') }}
       ]
     },
     {
@@ -120,16 +119,16 @@ function get_menu_template() {
       submenu: [
         {
           label: lg('反馈', 'Feedback'),
-          click() { require('electron').shell.openExternal('http://m4j0r.com/articles/19') }
+          click() { require('electron').shell.openExternal('https://github.com/fateleak/mwriter/issues') }
         },
         {
-          label: lg('检查更新', "Check for updates"),
-          click() { openCheckUpdateWindow() }
+          label: lg('官方网站', "Check for updates"),
+          click() { require('electron').shell.openExternal('http://mwriter.netqon.com') }
         },
         { type: 'separator' },
         {
           label: lg('了解更多', 'Learn More'),
-          click() { require('electron').shell.openExternal('http://afcapp.boringuniverse.com') }
+          click() { require('electron').shell.openExternal('http://netqon.com') }
         }
       ]
     }
