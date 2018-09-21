@@ -35,7 +35,6 @@ let g_src_editor = null
 
 let g_editor_options = {
   value: [
-    '# hello netqon'
   ].join('\n'),
   language: 'markdown',
   automaticLayout: true,
@@ -63,6 +62,16 @@ let g_editor_options = {
 function onModuleLoaded() {
   g_src_editor = monaco.editor.create(document.getElementById('src_editor'), g_editor_options)
   on_editor_inited()
+}
+
+let g_to_load_last_record = true;
+function try_load_last_record() {
+  if (g_src_editor && g_selected_target_element && g_to_load_last_record) {
+    g_to_load_last_record = false;
+    let p = store.get('last-record-path', null);
+    if (p) on_select_record(g_record_map[p]);
+    
+  }
 }
 
 let g_side_width = 0
@@ -116,6 +125,8 @@ document.addEventListener('DOMContentLoaded', function () {
   reset_target_space_width()
 
   reload_targets();
+
+
 })
 
 /* targets */
@@ -131,7 +142,7 @@ function add_new_target_element(target) {
   new_element.find('.target-name').text(p)
 
   new_element.prependTo('#target_list')
-  new_element.web_target = target
+  new_element.web_target_path = target
   g_target_map[target] = new_element
 
   new_element.click(on_select_target.bind(null, target))
@@ -148,18 +159,17 @@ function add_new_target_element(target) {
   })
 
   new_element.dblclick(on_reveal_in_finder.bind(null, new_element))
-
 }
 
 function on_click_remove_target(target_element) {
   if (confirm('remove this folder?')) {
-    mystore.remove_target(target_element.web_target)
+    mystore.remove_target(target_element.web_target_path)
     target_element.remove()
   }
 }
 
 function on_reveal_in_finder(target_element) {
-  electron.remote.shell.openItem(target_element.web_target);
+  electron.remote.shell.openItem(target_element.web_target_path);
 }
 
 let g_under_deleting_record_element = null
@@ -173,7 +183,7 @@ function on_click_remove_record(record_element) {
 let g_under_delete_records_element = null
 function on_click_delete_records(target_element) {
   g_under_delete_records_element = target_element
-  $('#delete_records_dialog').find('#delete_records_target_name').text(target_element.web_target.name)
+  $('#delete_records_dialog').find('#delete_records_target_name').text(target_element.web_target_path.name)
   $('#delete_records_dialog').modal('show')
 }
 
@@ -184,18 +194,7 @@ function on_click_mark_all_read(target_element) {
 
   target_element.find('.target-indication').attr('indication', 'false')
 
-  electron.ipcRenderer.send('mark-all-read', target_element.web_target.id)
-}
-
-function on_click_remove_target_confirm() {
-  $('#remove_target_dialog').modal('hide')
-
-  if (g_under_removing_target_element == g_selected_target_element) {
-    unselect_current_target()
-  }
-  g_under_removing_target_element.remove()
-  electron.ipcRenderer.send('remove-target', g_under_removing_target_element.web_target.id)
-  g_under_removing_target_element = null
+  electron.ipcRenderer.send('mark-all-read', target_element.web_target_path.id)
 }
 
 function on_click_remove_record_confirm() {
@@ -213,22 +212,22 @@ function on_click_remove_record_confirm() {
 function on_click_delete_records_confirm() {
   $('#delete_records_dialog').modal('hide')
   $('#record_list').empty()
-  electron.ipcRenderer.send('delete-records', g_under_delete_records_element.web_target.id)
+  electron.ipcRenderer.send('delete-records', g_under_delete_records_element.web_target_path.id)
   g_under_delete_records_element = null
 }
 
 function on_click_toggle_pause_target(target_element) {
   console.log('click pause/resume target')
-  target_element.web_target.state = target_element.web_target.state == utils.TARGET_STATE.NORMAL ? utils.TARGET_STATE.PAUSED : utils.TARGET_STATE.NORMAL
-  target_element.find('.target-paused').attr('paused', target_element.web_target.state == utils.TARGET_STATE.NORMAL ? "false" : "true")
-  electron.ipcRenderer.send('set-target-state', { target_id: target_element.web_target.id, state: target_element.web_target.state })
+  target_element.web_target_path.state = target_element.web_target_path.state == utils.TARGET_STATE.NORMAL ? utils.TARGET_STATE.PAUSED : utils.TARGET_STATE.NORMAL
+  target_element.find('.target-paused').attr('paused', target_element.web_target_path.state == utils.TARGET_STATE.NORMAL ? "false" : "true")
+  electron.ipcRenderer.send('set-target-state', { target_id: target_element.web_target_path.id, state: target_element.web_target_path.state })
 }
 
 function on_click_toggle_mute_target(target_element) {
   console.log('click mute/unmute target')
-  target_element.web_target.muted = target_element.web_target.muted == 0 ? 1 : 0
-  target_element.find('.target-muted').attr('muted', target_element.web_target.muted == 0 ? "false" : "true")
-  electron.ipcRenderer.send('set-target-muted', { target_id: target_element.web_target.id, state: target_element.web_target.muted })
+  target_element.web_target_path.muted = target_element.web_target_path.muted == 0 ? 1 : 0
+  target_element.find('.target-muted').attr('muted', target_element.web_target_path.muted == 0 ? "false" : "true")
+  electron.ipcRenderer.send('set-target-muted', { target_id: target_element.web_target_path.id, state: target_element.web_target_path.muted })
 }
 
 electron.ipcRenderer.on('new-target', function (e, target) {
@@ -250,13 +249,13 @@ electron.ipcRenderer.on('new-target-icon', function (e, data) {
 
 let g_selected_target_element = null
 
-function on_select_target(target) {
+function on_select_target(target_path) {
   $('#help_space').hide()
   $('#record_space').show()
   $('#content_space').show()
 
-  let element = g_target_map[target]
-  console.log('click select element', target)
+  let element = g_target_map[target_path]
+  console.log('click select element', target_path)
 
   if (g_selected_target_element == element) {
     return
@@ -273,18 +272,19 @@ function on_select_target(target) {
   g_record_map = {}
 
   reload_target_records()
+
+  store.set('last-target-path', target_path)
 }
 
 let IMG_EXT_LIST = ['md', 'MD']
 function reload_target_records() {
-  let target = g_selected_target_element.web_target
+  let target = g_selected_target_element.web_target_path
   console.log('reload target reocrds', target)
 
   if (!fs.existsSync(target)) {
     alert(`${target} ${utils.lg('不存在', "doesn't exist")}`)
     return
   }
-
 
   fs.readdir(target, (err, files) => {
     files.forEach(file => {
@@ -296,27 +296,17 @@ function reload_target_records() {
         add_new_record_element(tmp_full_path);
       }
     });
+    try_load_last_record();
     //TODO should check file is real file
     //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
   })
 }
 
-function unselect_current_target() {
-  if (g_selected_target_element) {
-    unselect_current_record()
-    g_selected_target_element.attr('select', 'false')
-    g_selected_target_element = null
-  }
-}
-
 function unselect_current_record() {
   if (g_selected_record_element) {
     g_dirty = false
-
     g_selected_record_element.attr('select', 'false')
     g_selected_record_element = null
-
-    g_src_editor.setValue('')
   }
 }
 
@@ -352,6 +342,10 @@ function reload_targets() {
   targets.forEach(target => {
     add_new_target_element(target)
   })
+
+  let p = store.get('last-target-path', null);
+  if (p) on_select_target(p);
+
 }
 
 function on_click_config_target(target_element) {
@@ -359,8 +353,8 @@ function on_click_config_target(target_element) {
   g_under_config_target_element = target_element
   $('#target_dialog_title').text('Edit Collection')
 
-  $('#new_target_name').val(target_element.web_target.name)
-  $('#new_target_address').val(target_element.web_target.address)
+  $('#new_target_name').val(target_element.web_target_path.name)
+  $('#new_target_address').val(target_element.web_target_path.address)
 
   $('#new_target_dialog').modal('show')
 }
@@ -391,15 +385,15 @@ function on_click_btn_add_new_target_confirm() {
     })
   } else {
     electron.ipcRenderer.send('update-target', {
-      id: g_under_config_target_element.web_target.id,
+      id: g_under_config_target_element.web_target_path.id,
       name: name,
       address: address,
     })
 
     g_under_config_target_element.find('.target-name').text(name)
     g_under_config_target_element.find('.target-address').text(address)
-    g_under_config_target_element.web_target.address = address
-    g_under_config_target_element.web_target.name = name
+    g_under_config_target_element.web_target_path.address = address
+    g_under_config_target_element.web_target_path.name = name
 
   }
 
@@ -424,15 +418,15 @@ function right_showing_desc(record) {
 }
 
 function refresh_record_ui(record_element) {
-  //根据他的web_path指向的文件
-  record_element.find('.record-name').text(record_element.web_path.split(path.sep).pop())
+  //根据他的web_record_path指向的文件
+  record_element.find('.record-name').text(record_element.web_record_path.split(path.sep).pop())
 }
 
 function add_new_record_element(full_path) {
 
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
-  new_element.web_path = full_path
+  new_element.web_record_path = full_path
   new_element.appendTo('#record_list')
   g_record_map[full_path] = new_element
 
@@ -462,7 +456,7 @@ function on_click_record_remove(element) {
 
 }
 function on_click_open_record_external(element) {
-  electron.remote.shell.openItem(element.web_path);
+  electron.remote.shell.openItem(element.web_record_path);
 }
 
 function on_click_record_toggle_pintop(element) {
@@ -470,9 +464,7 @@ function on_click_record_toggle_pintop(element) {
 }
 
 let g_selected_record_element = null
-function on_select_record(record_element) {
-
-  let element = record_element;
+function on_select_record(element) {
 
   if (g_selected_record_element == element) {
     //same one, pass
@@ -489,13 +481,14 @@ function on_select_record(record_element) {
   element.attr('select', 'true')
   g_selected_record_element = element
 
-
   reload_record_data()
+
+  store.set('last-record-path', element.web_record_path)
 }
 
 function get_current_record_file() {
   if (g_selected_record_element) {
-    return g_selected_record_element.web_path;
+    return g_selected_record_element.web_record_path;
   } else {
     return null;
   }
@@ -520,7 +513,7 @@ function on_click_new_record() {
 
   if (g_selected_target_element) {
     let file_name = 'unamed-' + (Date.now() % 10000) + '.md'
-    let new_fn = path.join(g_selected_target_element.web_target, file_name);
+    let new_fn = path.join(g_selected_target_element.web_target_path, file_name);
     fs.writeFile(new_fn, '@' + file_name, (err) => {
       toastr.info('new file')
     })
@@ -542,7 +535,7 @@ function save_routine() {
     let tmp_data = g_src_editor.getValue()
     let new_filename = fetch_file_name(tmp_data)
     console.log('gen fn', new_filename)
-    let tmp_fn = path.join(g_selected_target_element.web_target, new_filename)
+    let tmp_fn = path.join(g_selected_target_element.web_target_path, new_filename)
     fs.writeFile(fn_curr, tmp_data, (err) => {
       if (err) {
         alert(err)
@@ -556,7 +549,7 @@ function save_routine() {
             alert(err)
           } else {
             toastr.info('renamed');
-            g_selected_record_element.web_path = tmp_fn;
+            g_selected_record_element.web_record_path = tmp_fn;
             refresh_record_ui(g_selected_record_element);
           }
         })
@@ -639,8 +632,8 @@ function on_editor_inited() {
     })
   })
 
-  init_context_acions()
-
+  init_context_acions();
+  try_load_last_record();
 }
 
 function init_context_acions() {
@@ -713,16 +706,6 @@ electron.ipcRenderer.on('cmd-new-record', function (e, data) {
 
 electron.ipcRenderer.on('cmd-save', function (e, data) {
   on_click_save()
-})
-
-electron.ipcRenderer.on('cmd-select-target', function (e, data) {
-  on_select_target(data)
-  $('#target_list').scrollTo(g_target_map[data])
-})
-
-electron.ipcRenderer.on('cmd-select-record', function (e, data) {
-  on_select_record(data)
-  $('#records_space').scrollTo(g_record_map[data])
 })
 
 electron.ipcRenderer.on('cmd-toggle-preview', function (e, data) {

@@ -15,6 +15,10 @@
     padding: 0px;
 }
 
+.no-selection{
+    user-select: none;
+}
+
 a{
     user-select: none;
     cursor: default;
