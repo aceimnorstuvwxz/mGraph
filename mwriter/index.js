@@ -467,17 +467,13 @@ let g_selected_record_element = null
 function on_select_record(element) {
 
   if (g_selected_record_element == element) {
-    //same one, pass
     return
   }
 
-  //try save current
   save_routine()
 
-  //unselect current
   unselect_current_record()
 
-  //select new
   element.attr('select', 'true')
   g_selected_record_element = element
 
@@ -502,6 +498,12 @@ function reload_record_data() {
         alert(err)
       } else {
         let text = data.toString()
+        let tmp_infile = fetch_file_name(text);
+        let fn_real = fn.split(path.sep).pop()
+        if (fn_real != tmp_infile) {
+          //需手动增设@file_name的第一行
+          text = `@${fn_real}\n` + text;
+        }
         g_src_editor.setValue(text);
         g_dirty = false
       }
@@ -537,13 +539,16 @@ function save_routine() {
     let new_filename = fetch_file_name(tmp_data)
     console.log('gen fn', new_filename)
     let tmp_fn = path.join(g_selected_target_element.web_target_path, new_filename)
+    if (tmp_data.startsWith('@')) {
+      tmp_data = tmp_data.slice(tmp_data.indexOf('\n')+1)
+    }
     fs.writeFile(fn_curr, tmp_data, (err) => {
       if (err) {
         alert(err)
       } else {
         toastr.info('saved');
 
-      if (tmp_fn != fn_curr) {
+      if (new_filename.length > 0 &&  tmp_fn != fn_curr) {
         //需要重命名
         fs.rename(fn_curr, tmp_fn, (err)=>{
           if (err){
@@ -567,9 +572,9 @@ function fetch_file_name(data) {
   if (first_line.startsWith('@')) {
     fn = first_line.slice(1)
   } else {
-    fn = rmmd.rmmd(data, nd=true)
+    fn = rmmd.rmmd(first_line, nd=true)
   }
-  if (SUPPORTED_EXT_LIST.indexOf(fn.toLowerCase())!=-1) {
+  if (fn.length > 0 && SUPPORTED_EXT_LIST.indexOf(utils.get_file_ext(fn.toLowerCase())) == -1) {
     fn = fn + '.md'
   }
   return fn;
@@ -581,29 +586,6 @@ window.onbeforeunload = function () {
   store.set('width', window.innerWidth)
   store.set('height', window.innerHeight)
 }
-
-function find_top_2_filled_line(model) {
-  let ret = [null, null]
-  for (let i = 1; i <= model.getLineCount(); i++) {
-    let line = model.getLineContent(i).trim()
-    console.log('line', i, line)
-    if (line.length != 0) {
-      if (ret[0] == null) {
-        ret[0] = line
-      } else {
-        ret[1] = line
-        break
-      }
-    }
-  }
-  console.log('top2', ret)
-  return ret
-}
-
-function notnull(s) {
-  return s == null ? '' : s
-}
-
 
 function on_editor_inited() {
 
@@ -618,9 +600,9 @@ function on_editor_inited() {
 
     e.changes.forEach(function (change) {
       if (change.range.startLineNumber < 5) {
-        let top2 = find_top_2_filled_line(src_model)
-        let new_title = rmmd.rmmd(notnull(top2[0]), true)
-        let new_desc = rmmd.rmmd(notnull(top2[1]), true)
+        // let top2 = find_top_2_filled_line(src_model)
+        // let new_title = rmmd.rmmd(notnull(top2[0]), true)
+        // let new_desc = rmmd.rmmd(notnull(top2[1]), true)
         // if (g_current_record_data.src_title != new_title) {
         //   g_current_record_data.src_title = new_title
         //   on_selected_record_title_data_changed()
