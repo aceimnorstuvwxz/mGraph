@@ -174,10 +174,6 @@ function on_reveal_in_finder(target_element) {
 let g_selected_target_element = null
 
 function on_select_target(target_path) {
-  $('#help_space').hide()
-  $('#record_space').show()
-  $('#content_space').show()
-
   let element = g_target_map[target_path]
   console.log('click select element', target_path)
 
@@ -211,15 +207,26 @@ function reload_target_records() {
   }
 
   fs.readdir(target, (err, files) => {
+    let ents = []
     files.forEach(file => {
       // console.log(file);
       let ext = utils.get_file_ext(file)
       if (SUPPORTED_EXT_LIST.indexOf(ext) != -1) {
         //is image
         let tmp_full_path = path.join(target,file);
-        add_new_record_element(tmp_full_path);
+        let stat = fs.statSync(tmp_full_path)
+        ents.push({f:tmp_full_path,s:stat})
+        console.log(tmp_full_path, stat);
       }
     });
+
+
+    ents = ents.sort((a,b)=>{return b.s.ctimeMs - a.s.ctimeMs})
+
+    ents.forEach(ent=>{
+      add_new_record_element(ent.f);
+    })
+
     try_load_last_record();
     //TODO should check file is real file
     //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
@@ -294,12 +301,16 @@ function refresh_record_ui(record_element) {
   record_element.find('.record-name').text(record_element.web_record_path.split(path.sep).pop())
 }
 
-function add_new_record_element(full_path) {
+function add_new_record_element(full_path, top=false) {
 
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
   new_element.web_record_path = full_path
-  new_element.appendTo('#record_list')
+  if (top) {
+    new_element.prependTo('#record_list')
+  } else {
+    new_element.appendTo('#record_list')
+  }
   g_record_map[full_path] = new_element
 
   refresh_record_ui(new_element)
@@ -401,7 +412,7 @@ function on_click_new_record() {
       toastr.info('new file')
     })
 
-    add_new_record_element(new_fn)
+    add_new_record_element(new_fn, top=true)
     on_select_record(g_record_map[new_fn])
   }
 }
