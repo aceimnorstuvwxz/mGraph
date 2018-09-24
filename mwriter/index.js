@@ -191,16 +191,22 @@ function on_select_target(target_path) {
   element.attr('select', 'true')
   g_selected_target_element = element
 
-  $('#record_list').empty()
-  g_record_map = {}
-
   reload_target_records()
 
   store.set('last-target-path', target_path)
 }
 
 let SUPPORTED_EXT_LIST = ['md', 'MD', 'txt', 'TXT']
+electron.ipcRenderer.on('databind-change', (e, which)=>{
+  if (which == 'file_sort_method') {
+    reload_target_records();
+  }
+})
 function reload_target_records() {
+
+  $('#record_list').empty()
+  g_record_map = {}
+
   let target = g_selected_target_element.web_target_path
   console.log('reload target reocrds', target)
 
@@ -212,19 +218,24 @@ function reload_target_records() {
   fs.readdir(target, (err, files) => {
     let ents = []
     files.forEach(file => {
-      // console.log(file);
       let ext = utils.get_file_ext(file)
       if (SUPPORTED_EXT_LIST.indexOf(ext) != -1) {
-        //is image
         let tmp_full_path = path.join(target,file);
         let stat = fs.statSync(tmp_full_path)
+        console.log(tmp_full_path, stat)
         ents.push({f:tmp_full_path,s:stat})
-        console.log(tmp_full_path, stat);
       }
     });
 
-
-    ents = ents.sort((a,b)=>{return b.s.ctimeMs - a.s.ctimeMs})
+    let sort_type = store.get('file_sort_method', 'create')
+    if (sort_type == 'create') {
+      ents = ents.sort((a,b)=>{return b.s.birthtimeMs - a.s.birthtimeMs})
+    } else if (sort_type == 'edit') {
+      ents = ents.sort((a,b)=>{return b.s.mtimeMs - a.s.mtimeMs})
+    } else {
+      //filename
+      //原始的顺序就是按名称排序的
+    }
 
     ents.forEach(ent=>{
       add_new_record_element(ent.f);

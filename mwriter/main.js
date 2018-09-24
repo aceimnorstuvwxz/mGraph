@@ -39,7 +39,7 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
-    createMainWindow()
+  createMainWindow()
 })
 
 app.on('will-quit', () => {
@@ -216,7 +216,7 @@ function get_menu_template() {
         },
         {
           label: 'devwin',
-          click(){
+          click() {
             openDevWindow()
           }
         }
@@ -267,6 +267,10 @@ let g_win_wh = {
   settings: [300, 600]
 }
 
-ipcMain.on('open-win', function(e, win_name){
+ipcMain.on('open-win', function (e, win_name) {
   winmgr.open_win(win_name, g_win_wh[win_name][0], g_win_wh[win_name][1])
+})
+
+ipcMain.on('databind-change', function (e, data) {
+  main_utils.notify_all_windows('databind-change', data);
 })
