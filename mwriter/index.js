@@ -66,7 +66,7 @@ function try_load_last_record() {
     g_to_load_last_record = false;
     let p = store.get('last-record-path', null);
     if (p) on_select_record(g_record_map[p]);
-    
+
   }
 }
 
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
   console.log("init window")
   locale.init()
 
- 
+
   toastr.options = {
     "closeButton": false,
     "debug": false,
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
   reload_targets();
 })
 
-function open_win(win_name){
+function open_win(win_name) {
   electron.ipcRenderer.send('open-win', win_name)
 }
 
@@ -162,8 +162,8 @@ function on_click_remove_target(target_element) {
   if (confirm('Remove this folder?')) {
     mystore.remove_target(target_element.web_target_path)
     if (g_selected_target_element == target_element) {
-      unselect_current_record(clear=true)
-      unselect_current_target(clear=true)
+      unselect_current_record(clear = true)
+      unselect_current_target(clear = true)
     }
     delete g_target_map[target_element.web_target_path]
     target_element.remove()
@@ -197,7 +197,7 @@ function on_select_target(target_path) {
 }
 
 let SUPPORTED_EXT_LIST = ['md', 'MD', 'txt', 'TXT']
-electron.ipcRenderer.on('databind-change', (e, which)=>{
+electron.ipcRenderer.on('databind-change', (e, which) => {
   if (which == 'file_sort_method') {
     reload_target_records();
   }
@@ -220,24 +220,24 @@ function reload_target_records() {
     files.forEach(file => {
       let ext = utils.get_file_ext(file)
       if (SUPPORTED_EXT_LIST.indexOf(ext) != -1) {
-        let tmp_full_path = path.join(target,file);
+        let tmp_full_path = path.join(target, file);
         let stat = fs.statSync(tmp_full_path)
         console.log(tmp_full_path, stat)
-        ents.push({f:tmp_full_path,s:stat})
+        ents.push({ f: tmp_full_path, s: stat })
       }
     });
 
     let sort_type = store.get('file_sort_method', 'create')
     if (sort_type == 'create') {
-      ents = ents.sort((a,b)=>{return b.s.birthtimeMs - a.s.birthtimeMs})
+      ents = ents.sort((a, b) => { return b.s.birthtimeMs - a.s.birthtimeMs })
     } else if (sort_type == 'edit') {
-      ents = ents.sort((a,b)=>{return b.s.mtimeMs - a.s.mtimeMs})
+      ents = ents.sort((a, b) => { return b.s.mtimeMs - a.s.mtimeMs })
     } else {
       //filename
       //原始的顺序就是按名称排序的
     }
 
-    ents.forEach(ent=>{
+    ents.forEach(ent => {
       add_new_record_element(ent.f);
     })
 
@@ -247,7 +247,7 @@ function reload_target_records() {
   })
 }
 
-function unselect_current_record(clear=false) {
+function unselect_current_record(clear = false) {
   if (g_selected_record_element) {
     g_dirty = false
     g_selected_record_element.attr('select', 'false')
@@ -258,7 +258,7 @@ function unselect_current_record(clear=false) {
   }
 }
 
-function unselect_current_target(clear=false){
+function unselect_current_target(clear = false) {
   if (g_selected_target_element) {
     g_selected_target_element.attr('select', 'false')
     g_selected_target_element = null
@@ -315,7 +315,7 @@ function refresh_record_ui(record_element) {
   record_element.find('.record-name').text(record_element.web_record_path.split(path.sep).pop())
 }
 
-function add_new_record_element(full_path, top=false) {
+function add_new_record_element(full_path, top = false) {
 
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
@@ -345,12 +345,12 @@ function add_new_record_element(full_path, top=false) {
   new_element.dblclick(on_click_open_record_external.bind(null, new_element))
 }
 function delete_record_ex(element) {
-  fs.unlink(element.web_record_path, (err)=>{
+  fs.unlink(element.web_record_path, (err) => {
     if (err) {
       alert(err)
     } else {
       toastr.info('deleted')
-      if (element == g_selected_record_element) unselect_current_record(clear=true);
+      if (element == g_selected_record_element) unselect_current_record(clear = true);
 
       delete g_record_map[element.web_record_path];
       element.remove()
@@ -359,7 +359,7 @@ function delete_record_ex(element) {
 }
 function on_click_record_delete(element) {
   let stat = fs.statSync(element.web_record_path)
-  if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000 ) {
+  if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000) {
     //创建时间和修改时间差不多，说明没编辑过，可以直接删除
     delete_record_ex(element);
   } else {
@@ -434,7 +434,7 @@ function on_click_new_record() {
       toastr.info('new file')
     })
 
-    add_new_record_element(new_fn, top=true)
+    add_new_record_element(new_fn, top = true)
     on_select_record(g_record_map[new_fn])
   }
 }
@@ -454,29 +454,18 @@ function save_routine() {
     console.log('gen fn', new_filename)
     let tmp_fn = path.join(g_selected_target_element.web_target_path, new_filename)
     if (tmp_data.startsWith('@')) {
-      tmp_data = tmp_data.slice(tmp_data.indexOf('\n')+1)
+      tmp_data = tmp_data.slice(tmp_data.indexOf('\n') + 1)
     }
-    fs.writeFile(fn_curr, tmp_data, (err) => {
-      if (err) {
-        alert(err)
-      } else {
-        toastr.info('saved');
+    fs.writeFileSync(fn_curr, tmp_data);
+    toastr.info('saved');
 
-      if (new_filename.length > 0 &&  tmp_fn != fn_curr) {
-        //需要重命名
-        fs.rename(fn_curr, tmp_fn, (err)=>{
-          if (err){
-            alert(err)
-          } else {
-            toastr.info('renamed');
-            g_selected_record_element.web_record_path = tmp_fn;
-            refresh_record_ui(g_selected_record_element);
-          }
-        })
-      }
-      }
-    })
-
+    if (new_filename.length > 0 && tmp_fn != fn_curr) {
+      //需要重命名
+      fs.renameSync(fn_curr, tmp_fn);
+      toastr.info('renamed');
+      g_selected_record_element.web_record_path = tmp_fn;
+      refresh_record_ui(g_selected_record_element);
+    }
   }
 }
 
@@ -486,7 +475,7 @@ function fetch_file_name(data) {
   if (first_line.startsWith('@')) {
     fn = first_line.slice(1)
   } else {
-    fn = rmmd.rmmd(first_line, nd=true)
+    fn = rmmd.rmmd(first_line, nd = true)
   }
   if (fn.length > 0 && SUPPORTED_EXT_LIST.indexOf(utils.get_file_ext(fn.toLowerCase())) == -1) {
     fn = fn + '.md'
