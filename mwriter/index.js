@@ -321,7 +321,7 @@ function add_new_record_element(full_path, top=false) {
     e.preventDefault()
     const menu = new Menu()
     menu.append(new MenuItem({ label: 'Delete', click: on_click_record_delete.bind(null, new_element) }))
-    menu.append(new MenuItem({ label: 'Open by External', click: on_click_open_record_external.bind(null, new_element) }))
+    menu.append(new MenuItem({ label: 'Open in Wild', click: on_click_open_record_external.bind(null, new_element) }))
     menu.append(new MenuItem({ type: 'separator' }))
 
     menu.append(new MenuItem({ label: 'New Note', click: on_click_new_record }))
@@ -330,20 +330,28 @@ function add_new_record_element(full_path, top=false) {
 
   new_element.dblclick(on_click_open_record_external.bind(null, new_element))
 }
+function delete_record_ex(element) {
+  fs.unlink(element.web_record_path, (err)=>{
+    if (err) {
+      alert(err)
+    } else {
+      toastr.info('deleted')
+      if (element == g_selected_record_element) unselect_current_record(clear=true);
 
+      delete g_record_map[element.web_record_path];
+      element.remove()
+    }
+  })
+}
 function on_click_record_delete(element) {
-  if (confirm('delete this file?')) {
-    fs.unlink(element.web_record_path, (err)=>{
-      if (err) {
-        alert(err)
-      } else {
-        toastr.info('deleted')
-        if (element == g_selected_record_element) unselect_current_record(clear=true);
-
-        delete g_record_map[element.web_record_path];
-        element.remove()
-      }
-    })
+  let stat = fs.statSync(element.web_record_path)
+  if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000 ) {
+    //创建时间和修改时间差不多，说明没编辑过，可以直接删除
+    delete_record_ex(element);
+  } else {
+    if (confirm('delete this file?')) {
+      delete_record_ex(element);
+    }
   }
 }
 

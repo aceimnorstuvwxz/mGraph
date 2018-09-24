@@ -139,7 +139,7 @@ html, body{
 }
 
 .target{
-    cursor: pointer;
+    cursor: default;
     padding: 3px 15px;
     color: black;
 }
@@ -166,7 +166,7 @@ html, body{
 
 .record{
     border-bottom: #EEE 1px solid;
-    cursor: pointer;
+    cursor: default;
     padding: 10px 0px;
     padding-left: 10px;
 }
