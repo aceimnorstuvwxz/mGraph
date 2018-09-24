@@ -27,7 +27,7 @@ amdRequire(['vs/editor/editor.main'], () => {
   onModuleLoaded();
 })
 
-let g_src_editor = null
+let g_myeditor = null
 
 let g_editor_options = {
   value: [
@@ -56,13 +56,13 @@ let g_editor_options = {
 }
 
 function onModuleLoaded() {
-  g_src_editor = monaco.editor.create(document.getElementById('src_editor'), g_editor_options)
+  g_myeditor = monaco.editor.create(document.getElementById('myeditor'), g_editor_options)
   on_editor_inited()
 }
 
 let g_to_load_last_record = true;
 function try_load_last_record() {
-  if (g_src_editor && g_selected_target_element && g_to_load_last_record) {
+  if (g_myeditor && g_selected_target_element && g_to_load_last_record) {
     g_to_load_last_record = false;
     let p = store.get('last-record-path', null);
     if (p) on_select_record(g_record_map[p]);
@@ -75,8 +75,8 @@ function update_editor_layout() {
   let unmain_width_total = $('#records_space').width() + $('#targets_space').width() + g_side_width
   let w = (window.innerWidth - unmain_width_total)
 
-  if (g_src_editor) {
-    g_src_editor.layout({ width: w, height: window.innerHeight - 30 })
+  if (g_myeditor) {
+    g_myeditor.layout({ width: w, height: window.innerHeight - 30 })
   }
 }
 
@@ -257,7 +257,7 @@ function unselect_current_record(clear = false) {
     g_selected_record_element.attr('select', 'false')
     g_selected_record_element = null
     if (clear) {
-      g_src_editor.setValue('')
+      g_myeditor.setValue('')
     }
   }
 }
@@ -422,8 +422,11 @@ function reload_record_data() {
           //需手动增设@file_name的第一行
           text = `@${fn_real}\n` + text;
         }
-        g_src_editor.setValue(text);
+        g_myeditor.setValue(text);
         g_dirty = false
+        if (is_in_preview()){
+          refresh_preview();
+        }
       }
     })
   }
@@ -453,7 +456,7 @@ function save_routine() {
   let fn_curr = get_current_record_file()
   if (fn_curr && g_dirty) {
     g_dirty = false
-    let tmp_data = g_src_editor.getValue()
+    let tmp_data = g_myeditor.getValue()
     let new_filename = fetch_file_name(tmp_data)
     console.log('gen fn', new_filename)
     let tmp_fn = path.join(g_selected_target_element.web_target_path, new_filename)
@@ -497,7 +500,7 @@ window.onbeforeunload = function () {
 function on_editor_inited() {
 
   // title desc following!
-  let src_model = g_src_editor.getModel()
+  let src_model = g_myeditor.getModel()
   src_model.onDidChangeContent(function (e) {
 
     if (g_selected_record_element == null) {
@@ -529,7 +532,7 @@ function on_editor_inited() {
 function init_context_acions() {
 
   // paste as Markdown
-  g_src_editor.addAction({
+  g_myeditor.addAction({
     id: 'myact-paste-as-markdown',
     label: 'Paste as Markdown',
     keybindings: [
@@ -546,7 +549,7 @@ function init_context_acions() {
   })
 
   // google
-  // g_src_editor.addAction({
+  // g_myeditor.addAction({
   //   id: 'myact-search',
   //   label: 'Google It',
   //   precondition: null,
@@ -554,7 +557,7 @@ function init_context_acions() {
   //   contextMenuGroupId: 'navigation',
   //   contextMenuOrder: 1.5,
   //   run: function (ed) {
-  //     let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
+  //     let selected_text = g_myeditor.getModel().getValueInRange(g_myeditor.getSelection())
   //     console.log('selected', selected_text)
 
   //     utils.google(selected_text)
@@ -564,7 +567,7 @@ function init_context_acions() {
 
   // translate to clipboard
 
-  // g_src_editor.addAction({
+  // g_myeditor.addAction({
   //   id: 'myact-translate',
   //   label: 'Translate',
   //   precondition: null,
@@ -572,7 +575,7 @@ function init_context_acions() {
   //   contextMenuGroupId: 'navigation',
   //   contextMenuOrder: 1.6,
   //   run: function (ed) {
-  //     let selected_text = g_src_editor.getModel().getValueInRange(g_src_editor.getSelection())
+  //     let selected_text = g_myeditor.getModel().getValueInRange(g_myeditor.getSelection())
   //     console.log('selected', selected_text)
 
   //     g_translating_src_lines = selected_text.split('\n')
@@ -605,7 +608,7 @@ electron.ipcRenderer.on('cmd-preview', function (e, data) {
 function on_click_dev_test() {
   console.log('dev test')
 
-  // let model = g_src_editor.getModel()
+  // let model = g_myeditor.getModel()
 
   // let pos = new monaco.Range(1,1,1,1)
   // console.log(pos)
@@ -616,13 +619,13 @@ function on_click_dev_test() {
 
 
   // way to put at certain pos
-  g_src_editor.executeEdits("", [
+  g_myeditor.executeEdits("", [
     { range: new monaco.Range(1, 1, 1, 1), text: "prepend" }
   ])
 
   // way to pust at cursor
-  g_src_editor.trigger('keyboard', 'type', { text: "中国人" })
-  console.log(getEventListeners(document.getElementById('src_editor')))
+  g_myeditor.trigger('keyboard', 'type', { text: "中国人" })
+  console.log(getEventListeners(document.getElementById('myeditor')))
 }
 
 function on_paste_as_markdown(editor) {
@@ -641,9 +644,9 @@ function on_click_toggle_targets() {
 }
 
 function reset_target_space_width() {
-  let flag = store.get('target_space', true)
-  $('#window_header').css('grid-template-columns', flag ? '150px 200px 1fr 1fr' : '80px 120px 1fr 1fr')
-  $('#total').css('grid-template-columns', flag ? '150px 200px 1fr auto' : '0px 200px 1fr auto')
+  let flag = store.get('target_space', true);
+  $('#window_header').css('grid-template-columns', flag ? '150px 200px 1fr' : '80px 120px 1fr');
+  $('#total').css('grid-template-columns', flag ? '150px 200px 1fr' : '0px 200px 1fr');
   if (flag) {
     $('#show_icon').hide()
     $('#hide_icon').show()
@@ -656,9 +659,9 @@ function reset_target_space_width() {
 
 
 function init_preview() {
-  $('.preview-toggle-tab').click((event)=>{
+  $('.preview-toggle-tab').click((event) => {
     let tag = $(event.target);
-    
+
     $('.preview-toggle-tab').attr('pressed', 'false');
     tag.attr('pressed', 'true');
 
@@ -667,7 +670,7 @@ function init_preview() {
 }
 
 function toggle_preview() {
-  if ($('#tab_preview').attr('pressed') == 'true') {
+  if (is_in_preview()) {
     $('#tab_preview').attr('pressed', 'false');
     $('#tab_markdown').attr('pressed', 'true');
   } else {
@@ -677,6 +680,27 @@ function toggle_preview() {
   on_preview_tab_change();
 }
 
+function is_in_preview() {
+  return document.getElementById('tab_preview').getAttribute('pressed') == 'true';
+}
 function on_preview_tab_change() {
   console.log('preview toggle');
+
+  refresh_preview();
+
+  if (is_in_preview()) {
+    $('#myeditor').hide();
+    $('#preview').show();
+  } else {
+    $('#myeditor').show();
+    $('#preview').hide();
+  }
+}
+
+function refresh_preview() {
+  let tmp_data = g_myeditor.getValue()
+  if (tmp_data.startsWith('@')) {
+    tmp_data = tmp_data.slice(tmp_data.indexOf('\n') + 1)
+  }
+  document.getElementById('preview').innerHTML = marked(tmp_data);
 }

@@ -94,7 +94,12 @@ html, body{
 
 #total{
     display: grid;
-    grid-template-columns: 100px 200px 1fr auto;
+    grid-template-columns: 100px 200px 1fr;
+}
+
+#preview{
+    overflow: scroll;
+    background: white;
 }
 
 #target_space{    
@@ -110,8 +115,8 @@ html, body{
 
 #editor_space{
     display: grid;
-    grid-template-columns: 1fr;
-    max-height: calc(100vh - 30px);
+    /* grid-template-columns: 1fr; */
+    height: calc(100vh - 30px);
 }
 
 .header-btn{
