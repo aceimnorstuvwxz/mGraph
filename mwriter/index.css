@@ -242,3 +242,15 @@ blockquote{
     position: relative;
     top:2px;
 }
+
+.head-tab{
+    background: #d7d7d7;
+    padding: 0px 10px;
+    border: 1px solid gray;
+    width: 100px;
+}
+
+
+.head-tab[pressed="true"]{
+    background: #ffffff;
+}

@@ -119,9 +119,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   setInterval(save_routine, 30 * 1000)
 
-  reset_target_space_width()
+  reset_target_space_width();
+
+  init_preview();
 
   reload_targets();
+
+
 })
 
 function open_win(win_name) {
@@ -222,7 +226,7 @@ function reload_target_records() {
       if (SUPPORTED_EXT_LIST.indexOf(ext) != -1) {
         let tmp_full_path = path.join(target, file);
         let stat = fs.statSync(tmp_full_path)
-        console.log(tmp_full_path, stat)
+        // console.log(tmp_full_path, stat)
         ents.push({ f: tmp_full_path, s: stat })
       }
     });
@@ -594,14 +598,9 @@ electron.ipcRenderer.on('cmd-save', function (e, data) {
   on_click_save()
 })
 
-electron.ipcRenderer.on('cmd-toggle-preview', function (e, data) {
-  if ($('#btn_markdown').attr('pressed') == "true") {
-    on_click_btn_preview()
-  } else {
-    on_click_btn_markdown()
-  }
+electron.ipcRenderer.on('cmd-preview', function (e, data) {
+  toggle_preview();
 })
-
 
 function on_click_dev_test() {
   console.log('dev test')
@@ -653,4 +652,31 @@ function reset_target_space_width() {
     $('#hide_icon').hide()
   }
   update_editor_layout()
+}
+
+
+function init_preview() {
+  $('.preview-toggle-tab').click((event)=>{
+    let tag = $(event.target);
+    
+    $('.preview-toggle-tab').attr('pressed', 'false');
+    tag.attr('pressed', 'true');
+
+    on_preview_tab_change();
+  })
+}
+
+function toggle_preview() {
+  if ($('#tab_preview').attr('pressed') == 'true') {
+    $('#tab_preview').attr('pressed', 'false');
+    $('#tab_markdown').attr('pressed', 'true');
+  } else {
+    $('#tab_preview').attr('pressed', 'true');
+    $('#tab_markdown').attr('pressed', 'false');
+  }
+  on_preview_tab_change();
+}
+
+function on_preview_tab_change() {
+  console.log('preview toggle');
 }

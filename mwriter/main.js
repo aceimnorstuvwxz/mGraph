@@ -79,6 +79,13 @@ function get_menu_template() {
           click() {
             main_utils.notify_all_windows('cmd-save')
           }
+        },
+        {
+          label: lg('预览', 'Preview'),
+          accelerator: 'CmdOrCtrl+/',
+          click() {
+            main_utils.notify_all_windows('cmd-preview')
+          }
         }
       ]
     },
