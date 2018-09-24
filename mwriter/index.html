@@ -26,13 +26,16 @@
   <div id="window_header" class="drag no-selection">
     <div id="head_folder" class="head_segments">
 
-    </div>
-    <div id="head_list" class="head_segments">
-
+      <a class="btn-head" id="btn_settings">
+        <i class="iconfont icon-settings2 btn-head-icon"></i>
+      </a>
       <a class="btn-head" id="btn_toggle_targets">
         <i class="iconfont icon-hidesidebarhoriz" id="hide_icon"></i>
         <i class="iconfont icon-showsidebarhoriz" id="show_icon"></i>
       </a>
+    </div>
+    <div id="head_list" class="head_segments">
+
       <a class="btn-head" id="btn_add_record">
         <i class="iconfont icon-write btn-head-icon"></i>
       </a>
@@ -63,7 +66,7 @@
 
       <div id="target_foot">
         <a id="btn_add_new_target" class="text-btn">
-          <i class="iconfont icon-folderplus"></i> <span>添加文件夹</span>
+          <i class="iconfont icon-loupe"></i> <span>添加文件夹</span>
         </a>
       </div>
 
@@ -87,8 +90,6 @@
     </div>
     
   </div>
-
-  <!-- <span id="btn_settings">Settings<i class="float-btn iconfont icon-settings" ></i></span> -->
 
   <script>
     var nodeRequire = global.require;

@@ -5,6 +5,7 @@ const uuidgen = require('uuid/v4');
 const main_utils = require('./main_utils')
 const Store = require('electron-store')
 const store = new Store()
+const winmgr = require('./winmgr')
 
 // /* Single instance */
 // if (utils.is_win()) {
@@ -226,7 +227,6 @@ function get_menu_template() {
   return menuTemplate
 }
 
-// ---------- Main Window ---------
 let mainWindow
 
 function createMainWindow() {
@@ -263,177 +263,10 @@ ipcMain.on('open-main-window', function (e, data) {
   createMainWindow()
 })
 
-//----------Settings window --------
-
-let settingWindow
-
-function createSettingWindow() {
-  if (settingWindow != null) {
-    settingWindow.show()
-  } else {
-    settingWindow = new BrowserWindow({
-      webPreferences: { webSecurity: false },
-      width: 300,
-      height: utils.is_win() ? 540 : 520
-    })
-
-    settingWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'settings.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-
-    settingWindow.setResizable(true)
-    if (utils.is_win()) {
-      // No menu for win in setting
-      settingWindow.setMenu(null)
-    }
-
-    settingWindow.on('closed', function () {
-      settingWindow = null
-    })
-  }
+let g_win_wh = {
+  settings: [300, 600]
 }
 
-
-ipcMain.on('open-settings', function (e, data) {
-  createSettingWindow()
+ipcMain.on('open-win', function(e, win_name){
+  winmgr.open_win(win_name, g_win_wh[win_name][0], g_win_wh[win_name][1])
 })
-
-/* share */
-let shareWindow
-
-function createShareWindow() {
-
-  shareWindow = new BrowserWindow({
-    webPreferences: { webSecurity: false },
-    width: 300,
-    height: utils.is_win() ? 530 : 500
-  })
-
-  shareWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'share.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  shareWindow.setResizable(true)
-  if (utils.is_win()) {
-    //No menu for windows in share win
-    shareWindow.setMenu(null)
-  }
-
-  shareWindow.on('closed', function () {
-    shareWindow = null
-  })
-
-}
-ipcMain.on('open_share', function (e) {
-  if (shareWindow == null) {
-    createShareWindow()
-  } else {
-    shareWindow.show()
-  }
-})
-
-
-// UPDATE
-let checkUpdateWindow;
-
-function openCheckUpdateWindow() {
-  if (checkUpdateWindow != null) {
-    checkUpdateWindow.show()
-  } else {
-    checkUpdateWindow = new BrowserWindow({
-      webPreferences: { webSecurity: false },
-      width: 300,
-      height: 500
-    })
-
-    checkUpdateWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'update.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-
-    checkUpdateWindow.setResizable(true)
-    if (utils.is_win()) {
-      // no menu for checkupdate win in windows
-      checkUpdateWindow.setMenu(null)
-    }
-
-    checkUpdateWindow.on('closed', function () {
-      checkUpdateWindow = null
-    })
-  }
-
-}
-
-ipcMain.on('open_update', function (e) {
-  openCheckUpdateWindow()
-})
-
-/* Dev win */
-let devWindow;//win32
-
-function openDevWindow() {
-  if (aboutWindow != null) {
-    devWindow.show()
-  } else {
-    devWindow = new BrowserWindow({
-      webPreferences: { webSecurity: false },
-      width: 800,
-      height: 600
-    })
-
-    devWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'dev.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-    devWindow.openDevTools()
-
-    devWindow.setResizable(true)
-    if (utils.is_win()) {
-      // no menu for checkupdate win in windows
-      devWindow.setMenu(null)
-    }
-
-    devWindow.on('closed', function () {
-      devWindow = null
-    })
-  }
-
-}
-
-/* ABOUT */
-let aboutWindow;//win32
-
-function openAboutWindow() {
-  if (aboutWindow != null) {
-    aboutWindow.show()
-  } else {
-    aboutWindow = new BrowserWindow({
-      webPreferences: { webSecurity: false },
-      width: 300,
-      height: 500
-    })
-
-    aboutWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'about.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-
-    aboutWindow.setResizable(true)
-    if (utils.is_win()) {
-      // no menu for checkupdate win in windows
-      aboutWindow.setMenu(null)
-    }
-
-    aboutWindow.on('closed', function () {
-      aboutWindow = null
-    })
-  }
-
-}

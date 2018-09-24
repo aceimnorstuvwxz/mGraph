@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   $('#btn_add_new_target').click(on_click_new_target)
   $('#btn_add_record').click(on_click_new_record)
+  $('#btn_settings').click(open_win.bind(null, 'settings'))
 
   setInterval(update_moment_time, 30 * 1000)
 
@@ -121,9 +122,11 @@ document.addEventListener('DOMContentLoaded', function () {
   reset_target_space_width()
 
   reload_targets();
-
-
 })
+
+function open_win(win_name){
+  electron.ipcRenderer.send('open-win', win_name)
+}
 
 /* targets */
 let g_target_map = {}
