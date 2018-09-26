@@ -71,17 +71,20 @@ function try_load_last_record() {
 }
 
 let g_side_width = 0
+
 function update_editor_layout() {
   let unmain_width_total = $('#records_space').width() + $('#targets_space').width() + g_side_width
   let w = (window.innerWidth - unmain_width_total)
 
   if (g_myeditor) {
-    g_myeditor.layout({ width: w, height: window.innerHeight - 30 })
+    g_myeditor.layout({ width: w, height: window.innerHeight - 30 });
   }
 }
+let resizeTimer;
 
 window.onresize = function (e) {
-  update_editor_layout()
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(update_editor_layout, 100);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
