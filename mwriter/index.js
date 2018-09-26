@@ -516,7 +516,12 @@ function on_editor_inited() {
     g_dirty = true
 
     e.changes.forEach(function (change) {
-      // console.log(change.range.startLineNumber);
+      console.log(change.range.startLineNumber);
+      let lineNumber = change.range.startLineNumber
+      let model = g_myeditor.getModel();
+      model.getLineTokens(lineNumber, /*inaccurateTokensAcceptable*/false);
+      let tks =  monaco.editor.tokenize(model.getLineContent(lineNumber), 'markdown');
+      console.log(tks);
       if (change.range.startLineNumber < 2) {
         on_first_line_changed();
         // let top2 = find_top_2_filled_line(src_model)
@@ -536,13 +541,7 @@ function on_editor_inited() {
 
   init_context_acions();
   try_load_last_record();
-
-  g_myeditor.onMouseMove(function (e) {
-    console.log('mousemove - ', e);
-  });
-
-  let tks = g_myeditor.tokenize('![](http://baidu.com)', 'markdown');
-  console.log('tks', tks);
+  
 }
 
 function on_after_set_value() {
