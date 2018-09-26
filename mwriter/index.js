@@ -568,6 +568,7 @@ function init_context_acions() {
     }
   })
   g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B, on_command_bold);
+  g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH, toggle_preview);
 
   g_myeditor.addCommand(monaco.KeyCode.Tab, function() {
     // services available in `ctx`
@@ -735,7 +736,8 @@ function on_preview_tab_change() {
     $('#preview').show();
   } else {
     $('#myeditor').show();
-    $('#preview').hide();
+    $('#preview').hide();     
+    g_myeditor.focus();
   }
 }
 
@@ -765,6 +767,7 @@ function on_command_bold() {
   g_myeditor.executeEdits("", [
     { range: g_myeditor.getSelection(), text: text }
   ]);
+
 
 }
 
