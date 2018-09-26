@@ -24,7 +24,7 @@ body{
     color: #333;
     display: grid;
     grid-template-rows: 30px 1fr;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 html, body{
@@ -117,6 +117,8 @@ html, body{
     display: grid;
     /* grid-template-columns: 1fr; */
     height: calc(100vh - 30px);
+    padding-left: 10px;
+    background: white;
 }
 
 .header-btn{
@@ -145,8 +147,7 @@ html, body{
 
 .target{
     cursor: default;
-    padding: 3px 15px;
-    color: black;
+    padding: 3px 20px;
 }
 
 .target[select="true"]{
@@ -173,11 +174,12 @@ html, body{
     border-bottom: #EEE 1px solid;
     cursor: default;
     padding: 10px 0px;
-    padding-left: 10px;
+    padding-left: 20px;
+    font-size: 12px;
 }
 
 .record[select="true"]{
-    background: rgb(255, 225, 161);
+    background: rgb(208, 208, 208);
 }
 
 /* styles for '...'  http://hackingui.com/front-end/a-pure-css-solution-for-multiline-text-truncation/*/ 

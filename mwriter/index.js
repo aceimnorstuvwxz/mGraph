@@ -37,7 +37,7 @@ let g_editor_options = {
   theme: "vs-light",
   lineNumbers: "off",
   fontFamily: "Microsoft YaHei,Arial,Helvetica,sans-serif,",
-  fontSize: 16,
+  fontSize: 14,
   wordWrap: 'on',
   codeLens: false,
   formatOnPaste: true,
