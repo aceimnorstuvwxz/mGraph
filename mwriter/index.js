@@ -420,6 +420,7 @@ function reload_record_data() {
           text = `@${fn_real}\n` + text;
         }
         g_myeditor.setValue(text);
+        on_after_set_value();
         g_dirty = false
         if (is_in_preview()){
           refresh_preview();
@@ -494,6 +495,9 @@ window.onbeforeunload = function () {
   store.set('height', window.innerHeight)
 }
 
+function on_first_line_changed() {
+
+}
 
 
 //////////////////////////////////////editor////////////////////////////////////
@@ -509,7 +513,9 @@ function on_editor_inited() {
     g_dirty = true
 
     e.changes.forEach(function (change) {
-      if (change.range.startLineNumber < 5) {
+      console.log(change.range.startLineNumber);
+      if (change.range.startLineNumber < 2) {
+        on_first_line_changed();
         // let top2 = find_top_2_filled_line(src_model)
         // let new_title = rmmd.rmmd(notnull(top2[0]), true)
         // let new_desc = rmmd.rmmd(notnull(top2[1]), true)
@@ -527,6 +533,19 @@ function on_editor_inited() {
 
   init_context_acions();
   try_load_last_record();
+
+}
+
+function on_after_set_value() {
+  g_myeditor.deltaDecorations([], [
+    {
+      range: new monaco.Range(1,1,1,3),
+      options: {
+        isWholeLine: true,
+        className: 'fileNameLine'
+      }
+    }
+  ]);
 }
 
 function init_context_acions() {
@@ -749,3 +768,16 @@ function on_command_bold() {
 
 }
 
+
+function refresh_file_name_meta() {
+  var decorations = editor.deltaDecorations([], [
+    {
+      range: new monaco.Range(3,1,3,1),
+      options: {
+        isWholeLine: true,
+        className: 'myContentClass',
+        glyphMarginClassName: 'myGlyphMarginClass'
+      }
+    }
+  ]);
+}

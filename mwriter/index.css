@@ -259,3 +259,8 @@ blockquote{
 .head-tab[pressed="true"]{
     background: #ffffff;
 }
+
+
+.fileNameLine {
+    background: rgb(231, 249, 255);
+}
