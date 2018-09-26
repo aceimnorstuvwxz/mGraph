@@ -537,6 +537,12 @@ function on_editor_inited() {
   init_context_acions();
   try_load_last_record();
 
+  g_myeditor.onMouseMove(function (e) {
+    console.log('mousemove - ', e);
+  });
+
+  let tks = g_myeditor.tokenize('![](http://baidu.com)', 'markdown');
+  console.log('tks', tks);
 }
 
 function on_after_set_value() {
