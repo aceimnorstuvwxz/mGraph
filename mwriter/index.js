@@ -36,7 +36,7 @@ let g_editor_options = {
   automaticLayout: true,
   theme: "vs-light",
   lineNumbers: "off",
-  fontFamily: "Arial",
+  fontFamily: "Arial", //不能连用多个font，会导致重影
   fontSize: 14,
   wordWrap: 'on',
   codeLens: false,
@@ -518,10 +518,8 @@ function on_editor_inited() {
     e.changes.forEach(function (change) {
       console.log(change.range.startLineNumber);
       let lineNumber = change.range.startLineNumber
-      let model = g_myeditor.getModel();
-      model.getLineTokens(lineNumber, /*inaccurateTokensAcceptable*/false);
-      let tks =  monaco.editor.tokenize(model.getLineContent(lineNumber), 'markdown');
-      console.log(tks);
+      check_line_token(lineNumber);
+
       if (change.range.startLineNumber < 2) {
         on_first_line_changed();
         // let top2 = find_top_2_filled_line(src_model)
@@ -542,6 +540,57 @@ function on_editor_inited() {
   init_context_acions();
   try_load_last_record();
   
+}
+
+function check_line_token(line_number) {
+  let model = g_myeditor.getModel();
+  model.getLineTokens(line_number, /*inaccurateTokensAcceptable*/false);
+  let line_content = model.getLineContent(line_number);
+  let tks_list =  monaco.editor.tokenize(line_content, 'markdown');
+
+  tks_list.forEach(tks=>{
+    tks.forEach(tk=>{
+      console.log(tk);
+      if (tk.type == 'string.link.md') {
+        on_find_link_inline(line_number, line_content);
+      }
+    })
+  })
+}
+
+function on_find_link_inline(line_number, line_content){
+  console.log("find link in ", line_number, line_content);
+  line_content = line_content.trim()
+  if (line_content.startsWith('![')) {
+    let link = line_content.slice(line_content.indexOf('(')+1);
+    link = link.slice(0, link.indexOf(')'));
+    console.log('find image', link);
+
+    var contentWidget = {
+      domNode: null,
+      getId: function() {
+        return 'my.content.widget2';
+      },
+      getDomNode: function() {
+        if (!this.domNode) {
+          this.domNode = document.createElement('img');
+          this.domNode.src = link;
+          this.domNode.style.background = 'grey';
+        }
+        return this.domNode;
+      },
+      getPosition: function() {
+        return {
+          position: {
+            lineNumber: line_number,
+            column: 0
+          },
+          preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE, monaco.editor.ContentWidgetPositionPreference.BELOW]
+        };
+      }
+    };
+    g_myeditor.addContentWidget(contentWidget);
+  }
 }
 
 function on_after_set_value() {
