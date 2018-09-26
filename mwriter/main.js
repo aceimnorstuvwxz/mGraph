@@ -303,3 +303,4 @@ ipcMain.on('open-win', function (e, win_name) {
 ipcMain.on('databind-change', function (e, data) {
   main_utils.notify_all_windows('databind-change', data);
 })
+

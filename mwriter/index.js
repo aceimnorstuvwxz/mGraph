@@ -36,8 +36,8 @@ let g_editor_options = {
   automaticLayout: true,
   theme: "vs-light",
   lineNumbers: "off",
-  fontFamily: "Menlo",
-  fontSize: 14,
+  fontFamily: "Microsoft YaHei,Arial,Helvetica,sans-serif,",
+  fontSize: 16,
   wordWrap: 'on',
   codeLens: false,
   formatOnPaste: true,
@@ -513,7 +513,7 @@ function on_editor_inited() {
     g_dirty = true
 
     e.changes.forEach(function (change) {
-      console.log(change.range.startLineNumber);
+      // console.log(change.range.startLineNumber);
       if (change.range.startLineNumber < 2) {
         on_first_line_changed();
         // let top2 = find_top_2_filled_line(src_model)
@@ -569,6 +569,7 @@ function init_context_acions() {
   })
   g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B, on_command_bold);
   g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH, toggle_preview);
+  g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_EQUAL, on_command_plus);
 
   g_myeditor.addCommand(monaco.KeyCode.Tab, function() {
     // services available in `ctx`
@@ -662,13 +663,13 @@ function on_click_dev_test() {
 
 
   // way to put at certain pos
-  g_myeditor.executeEdits("", [
-    { range: new monaco.Range(1, 1, 1, 1), text: "prepend" }
-  ])
+  // g_myeditor.executeEdits("", [
+    // { range: new monaco.Range(1, 1, 1, 1), text: "prepend" }
+  // ])
 
   // way to pust at cursor
-  g_myeditor.trigger('keyboard', 'type', { text: "中国人" })
-  console.log(getEventListeners(document.getElementById('myeditor')))
+  // g_myeditor.trigger('keyboard', 'type', { text: "中国人" })
+  // console.log(getEventListeners(document.getElementById('myeditor')))
 }
 
 function on_paste_as_markdown(editor) {
@@ -710,6 +711,11 @@ function init_preview() {
 
     on_preview_tab_change();
   })
+}
+
+function on_command_plus() {
+  // electron.webFrame.setZoomLevel(electron.webFrame.getZoomLevel()+0.5);
+  //这种方法，无法记忆。
 }
 
 function toggle_preview() {
