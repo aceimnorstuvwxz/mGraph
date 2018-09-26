@@ -377,9 +377,6 @@ function on_click_open_record_external(element) {
   electron.remote.shell.openItem(element.web_record_path);
 }
 
-function on_click_record_toggle_pintop(element) {
-
-}
 
 let g_selected_record_element = null
 function on_select_record(element) {
@@ -497,6 +494,9 @@ window.onbeforeunload = function () {
   store.set('height', window.innerHeight)
 }
 
+
+
+//////////////////////////////////////editor////////////////////////////////////
 function on_editor_inited() {
 
   // title desc following!
@@ -530,6 +530,7 @@ function on_editor_inited() {
 }
 
 function init_context_acions() {
+  console.log('init actions');
 
   // paste as Markdown
   g_myeditor.addAction({
@@ -540,14 +541,36 @@ function init_context_acions() {
     ],
     precondition: null,
     keybindingContext: null,
-    contextMenuGroupId: 'navigation',
-    contextMenuOrder: 1.5,
+    contextMenuGroupId: '9_cutcopypaste',
+    contextMenuOrder: 4,
     run: function (ed) {
       on_paste_as_markdown(ed)
       return null;
     }
   })
+  g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B, on_command_bold);
 
+  g_myeditor.addCommand(monaco.KeyCode.Tab, function() {
+    // services available in `ctx`
+    alert('my command is executing!');
+
+  }, 'myCondition1 && myCondition2')
+  // google
+  // g_myeditor.addAction({
+  //   id: 'myact-search',
+  //   label: 'Google It',
+  //   precondition: null,
+  //   keybindingContext: null,
+  //   contextMenuGroupId: '9_cutcopypaste',
+  //   contextMenuOrder: 1.5,
+  //   run: function (ed) {
+  //     let selected_text = g_myeditor.getModel().getValueInRange(g_myeditor.getSelection())
+  //     console.log('selected', selected_text)
+
+  //     utils.google(selected_text)
+  //     return null;
+  //   }
+  // })
   // google
   // g_myeditor.addAction({
   //   id: 'myact-search',
@@ -704,3 +727,25 @@ function refresh_preview() {
   }
   document.getElementById('preview').innerHTML = marked(tmp_data);
 }
+
+function on_command_bold() {
+  //先变斜，再按一次变粗了，再按一次变成内联代码
+  let text = g_myeditor.getModel().getValueInRange(g_myeditor.getSelection());
+  if (text.startsWith('**') && text.endsWith('**')) {
+    text = text.slice(2,-2);
+    text = "`"+text+"`";
+  } else if (!text.startsWith('*')) {
+    if (text.startsWith('`') && text.endsWith('`')){
+      text = text.slice(1,-1);
+    }
+    text = `*${text}*`;
+  }else if (text.startsWith('*') && text.endsWith('*')) {
+    text = `*${text}*`;
+  }
+
+  g_myeditor.executeEdits("", [
+    { range: g_myeditor.getSelection(), text: text }
+  ]);
+
+}
+

@@ -98,7 +98,29 @@ function get_menu_template() {
         { role: 'cut', label: lg('剪切', 'Cut') },
         { role: 'copy', label: lg('复制', 'Copy') },
         { role: 'paste', label: lg('粘贴', 'Paste') },
-        { role: 'selectall', label: lg('全选', 'Select All') }
+        { role: 'selectall', label: lg('全选', 'Select All') },
+        // { type: 'separator' },
+        // {
+        //   label: lg('加粗', 'Bold'),
+        //   accelerator: 'CmdOrCtrl+B',
+        //   click() {
+        //     main_utils.notify_all_windows('cmd-bold')
+        //   }
+        // },
+        // {
+        //   label: lg('斜体', 'Italic'),
+        //   accelerator: 'CmdOrCtrl+I',
+        //   click() {
+        //     main_utils.notify_all_windows('cmd-italic')
+        //   }
+        // },
+        // {
+        //   label: lg('行内代码', 'Inline Code'),
+        //   accelerator: 'CmdOrCtrl+T',
+        //   click() {
+        //     main_utils.notify_all_windows('cmd-italic')
+        //   }
+        // }
       ]
     },
     {
