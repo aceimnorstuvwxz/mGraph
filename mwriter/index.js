@@ -36,7 +36,7 @@ let g_editor_options = {
   automaticLayout: true,
   theme: "vs-light",
   lineNumbers: "off",
-  fontFamily: "Microsoft YaHei,Arial,Helvetica,sans-serif,",
+  fontFamily: "Arial",
   fontSize: 14,
   wordWrap: 'on',
   codeLens: false,
