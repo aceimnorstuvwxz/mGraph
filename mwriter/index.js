@@ -517,8 +517,8 @@ function on_editor_inited() {
 
     e.changes.forEach(function (change) {
       console.log(change.range.startLineNumber);
-      let lineNumber = change.range.startLineNumber
-      check_line_token(lineNumber);
+      // let lineNumber = change.range.startLineNumber
+      // check_line_token(lineNumber); //暂时关闭这个，无法用cotnentWidget做image的即时显示
 
       if (change.range.startLineNumber < 2) {
         on_first_line_changed();
@@ -590,6 +590,9 @@ function on_find_link_inline(line_number, line_content){
       }
     };
     g_myeditor.addContentWidget(contentWidget);
+    //问题：无法跟随position删除！
+
+
   }
 }
 

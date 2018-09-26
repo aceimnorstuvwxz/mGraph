@@ -174,7 +174,7 @@ function get_menu_template() {
         {
           label: lg('偏好设置', 'Preferences'),
           accelerator: 'CommandOrControl+,',
-          click() { createSettingWindow() }
+          click() { open_win('settings') }
         },
         { role: 'services', label: lg('服务', 'Services'), submenu: [] },
         { type: 'separator' },
@@ -199,7 +199,7 @@ function get_menu_template() {
     menuTemplate[0].submenu.push(
       {
         label: lg('设置', 'Settings'),
-        click() { createSettingWindow() },
+        click() { open_win('settings') },
         accelerator: 'Ctrl+,'
 
       }
@@ -220,7 +220,7 @@ function get_menu_template() {
       {
         role: 'about',
         label: lg('关于 MWriter', 'About MWriter'),
-        click() { openAboutWindow() }
+        click() { open_win('about') }
       }
     )
   }
@@ -299,6 +299,10 @@ let g_win_wh = {
 ipcMain.on('open-win', function (e, win_name) {
   winmgr.open_win(win_name, g_win_wh[win_name][0], g_win_wh[win_name][1])
 })
+
+function open_win(win_name) {
+  winmgr.open_win(win_name, g_win_wh[win_name][0], g_win_wh[win_name][1])
+}
 
 ipcMain.on('databind-change', function (e, data) {
   main_utils.notify_all_windows('databind-change', data);
