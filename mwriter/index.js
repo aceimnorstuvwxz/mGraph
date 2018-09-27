@@ -366,7 +366,7 @@ function delete_record_ex(element) {
 }
 function on_click_record_delete(element) {
   let stat = fs.statSync(element.web_record_path)
-  if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000) {
+  if (Math.abs(stat.birthtimeMs - stat.mtimeMs) < 1000) {
     //创建时间和修改时间差不多，说明没编辑过，可以直接删除
     delete_record_ex(element);
   } else {
