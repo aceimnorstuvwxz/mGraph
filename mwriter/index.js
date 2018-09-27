@@ -813,6 +813,7 @@ function refresh_preview() {
     tmp_data = tmp_data.slice(tmp_data.indexOf('\n') + 1)
   }
   document.getElementById('preview').innerHTML = marked(tmp_data);
+  $('#preview a').attr('target', '_blank');
 }
 
 function on_command_bold() {
@@ -833,8 +834,6 @@ function on_command_bold() {
   g_myeditor.executeEdits("", [
     { range: g_myeditor.getSelection(), text: text }
   ]);
-
-
 }
 
 
