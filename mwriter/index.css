@@ -21,7 +21,7 @@ a{
 
 body{
     background-color: rgb(244,242,243);
-    color: #333;
+    color: rgb(0, 0, 0);
     display: grid;
     grid-template-rows: 30px 1fr;
     font-size: 12px;
@@ -110,7 +110,7 @@ html, body{
 #record_space{
     height: 100%;
     border-right: 1px solid rgb(216, 216, 216);
-    background: rgb(245, 242, 240);
+    background: rgb(248, 249, 255);
 }
 
 #editor_space{
@@ -171,11 +171,12 @@ html, body{
 }
 
 .record{
-    border-bottom: #EEE 1px solid;
+    /* border-bottom: #EEE 1px solid; */
     cursor: default;
     padding: 10px 0px;
     padding-left: 20px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .record[select="true"]{
