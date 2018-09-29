@@ -418,12 +418,13 @@ function reload_record_data() {
         let text = data.toString()
         let tmp_infile = fetch_file_name(text);
         let fn_real = fn.split(path.sep).pop()
+        let atname = false
         if (fn_real != tmp_infile) {
           //需手动增设@file_name的第一行
           text = `@${fn_real}\n` + text;
+          atname = true;
         }
         g_myeditor.setValue(text);
-        on_after_set_value();
         g_dirty = false
         if (is_in_preview()){
           refresh_preview();
@@ -499,7 +500,8 @@ window.onbeforeunload = function () {
 }
 
 function on_first_line_changed() {
-
+  let text = g_myeditor.getModel().getLineContent(1);
+  refresh_first_line_deco(text.startsWith('@'));
 }
 
 
@@ -596,16 +598,21 @@ function on_find_link_inline(line_number, line_content){
   }
 }
 
-function on_after_set_value() {
-  g_myeditor.deltaDecorations([], [
+let g_old_deco = []
+function refresh_first_line_deco(is_atname) {
+  //对是否是@开头的，采用不同样式
+
+  g_old_deco = g_myeditor.deltaDecorations(g_old_deco, is_atname? [
     {
-      range: new monaco.Range(1,1,1,3),
+      range: new monaco.Range(1,1,1,100),
       options: {
-        isWholeLine: true,
-        className: 'fileNameLine'
+        // isWholeLine: true,
+        inlineClassName: 'fileNameLine',
+        stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
       }
     }
-  ]);
+  ]:[]
+  ); //此deco总会显示，使得无法selection，并且在内部编辑会延展下来
 }
 
 function init_context_acions() {
@@ -836,16 +843,3 @@ function on_command_bold() {
   ]);
 }
 
-
-function refresh_file_name_meta() {
-  var decorations = editor.deltaDecorations([], [
-    {
-      range: new monaco.Range(3,1,3,1),
-      options: {
-        isWholeLine: true,
-        className: 'myContentClass',
-        glyphMarginClassName: 'myGlyphMarginClass'
-      }
-    }
-  ]);
-}

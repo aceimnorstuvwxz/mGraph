@@ -258,12 +258,13 @@ blockquote{
     width: 100px;
 }
 
-
 .head-tab[pressed="true"]{
     background: #ffffff;
 }
 
-
 .fileNameLine {
-    background: rgb(231, 249, 255);
+	color: rgb(0, 81, 255) !important;
+	/* text-decoration: underline; */
+	font-weight: bold;
+	font-style: oblique;
 }
