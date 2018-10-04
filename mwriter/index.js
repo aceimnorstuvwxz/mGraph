@@ -22,6 +22,9 @@ let turndownService = new TurndownService({
 const trans = require('./transfan')
 const rmmd = require('./rmmd')
 
+if (utils.is_cn) {
+  moment.locale('zh-cn')
+}
 /* monaco editor */
 amdRequire(['vs/editor/editor.main'], () => {
   onModuleLoaded();
@@ -245,7 +248,7 @@ function reload_target_records() {
     }
 
     ents.forEach(ent => {
-      add_new_record_element(ent.f);
+      add_new_record_element(ent.f, sort_type == 'create'?ent.s.birthtimeMs:ent.s.mtimeMs);
     })
 
     try_load_last_record();
@@ -319,19 +322,34 @@ let g_record_map = {}
 
 function refresh_record_ui(record_element) {
   //根据他的web_record_path指向的文件
-  record_element.find('.record-name').text(record_element.web_record_path.split(path.sep).pop())
+  let full_name = record_element.web_record_path.split(path.sep).pop();
+  let ww = full_name.split('.')
+  if (ww.length > 1) {
+    record_element.find('.record-name-postfix').text(ww.pop())
+  }
+  record_element.find('.record-name-main').text(ww.join('.'))
+
+  if (record_element.web_record_date.isBefore(moment().add(-24*7,'hour'))) {
+    // myDate is less than one hour
+    record_element.find('.record-date').text(record_element.web_record_date.format('L'))
+  } else {
+    record_element.find('.record-date').text(record_element.web_record_date.fromNow())
+  }
 }
 
-function add_new_record_element(full_path, top = false) {
+function add_new_record_element(full_path, date_time, top = false) {
 
   let new_element = $('#record_template').clone()
   new_element.removeAttr('id')
   new_element.web_record_path = full_path
+  new_element.web_record_date = moment.unix(date_time / 1000)
+
   if (top) {
     new_element.prependTo('#record_list')
   } else {
     new_element.appendTo('#record_list')
   }
+
   g_record_map[full_path] = new_element
 
   refresh_record_ui(new_element)
@@ -439,11 +457,9 @@ function on_click_new_record() {
   if (g_selected_target_element) {
     let file_name = 'unamed-' + (Date.now() % 10000) + '.md'
     let new_fn = path.join(g_selected_target_element.web_target_path, file_name);
-    fs.writeFile(new_fn, '@' + file_name, (err) => {
-      toastr.info('new file')
-    })
-
-    add_new_record_element(new_fn, top = true)
+    fs.writeFileSync(new_fn, '@' + file_name)
+    let stat = fs.statSync(new_fn)
+    add_new_record_element(new_fn, stat.birthtimeMs, top = true)
     on_select_record(g_record_map[new_fn])
   }
 }
