@@ -163,7 +163,6 @@ html, body{
     max-height: calc(100vh - 30px);
     border-left: 1px solid #EEE;
     border-right: 1px solid #EEE;
-
 }
 
 #fill_record_space {
@@ -180,7 +179,7 @@ html, body{
 }
 
 .record[select="true"]{
-    background: rgb(245, 242, 238);
+    background: rgba(240, 230, 216, 0.495);
 }
 
 .record-name-postfix, .record-date{

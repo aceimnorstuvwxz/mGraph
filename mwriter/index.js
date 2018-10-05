@@ -15,7 +15,7 @@ let turndownService = new TurndownService({
   headingStyle: 'atx',
   bulletListMarker: '-',
   codeBlockStyle: 'fenced',
-  linkStyle: 'referenced',
+  // linkStyle: 'referenced',
   linkReferenceStyle: 'full',
   hr: '***'
 })
@@ -90,10 +90,42 @@ window.onresize = function (e) {
   resizeTimer = setTimeout(update_editor_layout, 100);
 }
 
+let g_toc = [];
+
+function init_for_toc() {
+  console.log('init for toc');
+  let renderer = new marked.Renderer();
+
+  renderer.heading = function (text, level, raw) {
+    let anchor = this.options.headerPrefix + raw.toLowerCase().replace(/[^\w\\u4e00-\\u9fa5]]+/g, '-');
+    g_toc.push({
+      anchor: anchor,
+      level: level,
+      text: text
+    });
+    console.log(g_toc);
+    return '<h'
+      + level
+      + ' id="'
+      + anchor
+      + '">'
+      + text
+      + '</h'
+      + level
+      + '>\n';
+  };
+
+  marked.setOptions({
+    headerPrefix: 'ref@', 
+    renderer: renderer
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   console.log("init window")
   locale.init()
 
+  init_for_toc();
 
   toastr.options = {
     "closeButton": false,
@@ -566,7 +598,7 @@ function on_editor_inited() {
     g_dirty = true
 
     e.changes.forEach(function (change) {
-      console.log(change.range.startLineNumber);
+      console.log('edit start line', change.range.startLineNumber);
       // let lineNumber = change.range.startLineNumber
       // check_line_token(lineNumber); //暂时关闭这个，无法用cotnentWidget做image的即时显示
 
@@ -850,9 +882,9 @@ function is_in_preview() {
 function on_preview_tab_change() {
   console.log('preview toggle');
 
-  refresh_preview();
-
   if (is_in_preview()) {
+    refresh_preview();
+
     $('#myeditor').hide();
     $('#preview').show();
   } else {
@@ -867,8 +899,38 @@ function refresh_preview() {
   if (tmp_data.startsWith('@')) {
     tmp_data = tmp_data.slice(tmp_data.indexOf('\n') + 1)
   }
-  document.getElementById('preview').innerHTML = marked(tmp_data);
-  $('#preview a').attr('target', '_blank');
+  
+  //关于toc的生成，见https://github.com/markedjs/marked/issues/545
+  //先获得toc数组，然后替换text中的[toc]为toc的Html内容
+  g_toc = []
+  mdtext = marked(tmp_data);
+  console.log('raw html', mdtext);
+  let toc_html = gen_toc_html(g_toc);
+  console.log('toc html:', toc_html);
+
+  mdtext = mdtext.split('<p>[toc]</p>').join(toc_html);
+  mdtext = mdtext.split('<p>[TOC]</p>').join(toc_html);
+
+  document.getElementById('preview').innerHTML = mdtext;
+
+  $('#preview a[href^="http"]').attr('target', '_blank');
+  $('#preview a[href^="HTTP"]').attr('target', '_blank');
+
+}
+
+function gen_toc_html(toc_list) {
+  //anchor/level/text
+  let text_list = []
+  toc_list.forEach(toc=>{
+    let tmp_html = `
+    <div class="toc-item"  level="${toc.level}"> <a href="#${toc.anchor}" >${toc.text}</a> </div>
+    `
+    text_list.push(tmp_html);
+  })
+
+  return `<div class="toc">
+    ${text_list.join('\n')}
+  </div>`
 }
 
 function on_command_bold() {
