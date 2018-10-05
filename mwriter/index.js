@@ -149,7 +149,8 @@ function add_new_target_element(target) {
   new_element.find('.target-name').text(p)
 
   new_element.prependTo('#target_list')
-  new_element.web_target_path = target
+  new_element.web_target_path = target;
+  new_element.web_target_name = p;
   g_target_map[target] = new_element
 
   new_element.click(on_select_target.bind(null, target))
@@ -248,7 +249,7 @@ function reload_target_records() {
     }
 
     ents.forEach(ent => {
-      add_new_record_element(ent.f, sort_type == 'create'?ent.s.birthtimeMs:ent.s.mtimeMs);
+      add_new_record_element(ent.f, sort_type == 'create' ? ent.s.birthtimeMs : ent.s.mtimeMs);
     })
 
     try_load_last_record();
@@ -329,7 +330,7 @@ function refresh_record_ui(record_element) {
   }
   record_element.find('.record-name-main').text(ww.join('.'))
 
-  if (record_element.web_record_date.isBefore(moment().add(-24*7,'hour'))) {
+  if (record_element.web_record_date.isBefore(moment().add(-24 * 7, 'hour'))) {
     // myDate is less than one hour
     record_element.find('.record-date').text(record_element.web_record_date.format('L'))
   } else {
@@ -361,6 +362,24 @@ function add_new_record_element(full_path, date_time, top = false) {
     const menu = new Menu()
     menu.append(new MenuItem({ label: 'Delete', click: on_click_record_delete.bind(null, new_element) }))
     menu.append(new MenuItem({ label: 'Open in Wild', click: on_click_open_record_external.bind(null, new_element) }))
+
+
+    let move_to_submenu = new Menu()
+    for (let target_id in g_target_map) {
+      if (g_target_map[target_id] != g_selected_target_element) {
+        let target_ele = g_target_map[target_id];
+        move_to_submenu.append(new MenuItem({
+          label: target_ele.web_target_name,
+          click: on_click_move_to_other.bind(null, new_element, target_ele.web_target_path)
+        }));
+      }
+    }
+    menu.append(new MenuItem({
+      label: 'Move To',
+      type: "submenu",
+      submenu: move_to_submenu
+    }))
+
     menu.append(new MenuItem({ type: 'separator' }))
 
     menu.append(new MenuItem({ label: 'New Note', click: on_click_new_record }))
@@ -396,6 +415,19 @@ function on_click_record_delete(element) {
 
 function on_click_open_record_external(element) {
   electron.remote.shell.openItem(element.web_record_path);
+}
+
+function on_click_move_to_other(element, target_folder_path) {
+  let curr_path = element.web_record_path;
+  let new_path = path.join(target_folder_path, curr_path.split(path.sep).pop());
+  fs.renameSync(curr_path, new_path);
+
+  if (element == g_selected_record_element) {
+    unselect_current_record(clear = true);
+  }
+
+  delete g_record_map[element.web_record_path]
+  element.remove()
 }
 
 
@@ -444,7 +476,7 @@ function reload_record_data() {
         }
         g_myeditor.setValue(text);
         g_dirty = false
-        if (is_in_preview()){
+        if (is_in_preview()) {
           refresh_preview();
         }
       }
@@ -557,17 +589,17 @@ function on_editor_inited() {
 
   init_context_acions();
   try_load_last_record();
-  
+
 }
 
 function check_line_token(line_number) {
   let model = g_myeditor.getModel();
   model.getLineTokens(line_number, /*inaccurateTokensAcceptable*/false);
   let line_content = model.getLineContent(line_number);
-  let tks_list =  monaco.editor.tokenize(line_content, 'markdown');
+  let tks_list = monaco.editor.tokenize(line_content, 'markdown');
 
-  tks_list.forEach(tks=>{
-    tks.forEach(tk=>{
+  tks_list.forEach(tks => {
+    tks.forEach(tk => {
       console.log(tk);
       if (tk.type == 'string.link.md') {
         on_find_link_inline(line_number, line_content);
@@ -576,20 +608,20 @@ function check_line_token(line_number) {
   })
 }
 
-function on_find_link_inline(line_number, line_content){
+function on_find_link_inline(line_number, line_content) {
   console.log("find link in ", line_number, line_content);
   line_content = line_content.trim()
   if (line_content.startsWith('![')) {
-    let link = line_content.slice(line_content.indexOf('(')+1);
+    let link = line_content.slice(line_content.indexOf('(') + 1);
     link = link.slice(0, link.indexOf(')'));
     console.log('find image', link);
 
     var contentWidget = {
       domNode: null,
-      getId: function() {
+      getId: function () {
         return 'my.content.widget2';
       },
-      getDomNode: function() {
+      getDomNode: function () {
         if (!this.domNode) {
           this.domNode = document.createElement('img');
           this.domNode.src = link;
@@ -597,7 +629,7 @@ function on_find_link_inline(line_number, line_content){
         }
         return this.domNode;
       },
-      getPosition: function() {
+      getPosition: function () {
         return {
           position: {
             lineNumber: line_number,
@@ -618,16 +650,16 @@ let g_old_deco = []
 function refresh_first_line_deco(is_atname) {
   //对是否是@开头的，采用不同样式
 
-  g_old_deco = g_myeditor.deltaDecorations(g_old_deco, is_atname? [
+  g_old_deco = g_myeditor.deltaDecorations(g_old_deco, is_atname ? [
     {
-      range: new monaco.Range(1,1,1,100),
+      range: new monaco.Range(1, 1, 1, 100),
       options: {
         // isWholeLine: true,
         inlineClassName: 'fileNameLine',
         stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
       }
     }
-  ]:[]
+  ] : []
   ); //此deco总会显示，使得无法selection，并且在内部编辑会延展下来
 }
 
@@ -654,7 +686,7 @@ function init_context_acions() {
   g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH, toggle_preview);
   g_myeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_EQUAL, on_command_plus);
 
-  g_myeditor.addCommand(monaco.KeyCode.Tab, function() {
+  g_myeditor.addCommand(monaco.KeyCode.Tab, function () {
     // services available in `ctx`
     alert('my command is executing!');
 
@@ -747,7 +779,7 @@ function on_click_dev_test() {
 
   // way to put at certain pos
   // g_myeditor.executeEdits("", [
-    // { range: new monaco.Range(1, 1, 1, 1), text: "prepend" }
+  // { range: new monaco.Range(1, 1, 1, 1), text: "prepend" }
   // ])
 
   // way to pust at cursor
@@ -825,7 +857,7 @@ function on_preview_tab_change() {
     $('#preview').show();
   } else {
     $('#myeditor').show();
-    $('#preview').hide();     
+    $('#preview').hide();
     g_myeditor.focus();
   }
 }
@@ -843,14 +875,14 @@ function on_command_bold() {
   //先变斜，再按一次变粗了，再按一次变成内联代码
   let text = g_myeditor.getModel().getValueInRange(g_myeditor.getSelection());
   if (text.startsWith('**') && text.endsWith('**')) {
-    text = text.slice(2,-2);
-    text = "`"+text+"`";
+    text = text.slice(2, -2);
+    text = "`" + text + "`";
   } else if (!text.startsWith('*')) {
-    if (text.startsWith('`') && text.endsWith('`')){
-      text = text.slice(1,-1);
+    if (text.startsWith('`') && text.endsWith('`')) {
+      text = text.slice(1, -1);
     }
     text = `*${text}*`;
-  }else if (text.startsWith('*') && text.endsWith('*')) {
+  } else if (text.startsWith('*') && text.endsWith('*')) {
     text = `*${text}*`;
   }
 
