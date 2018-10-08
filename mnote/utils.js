@@ -64,7 +64,7 @@ exports.safe_json_parse = (text) => {
 }
 
 exports.get_embedded_url = () => {
-    return 'http://mwriter.netqon.com/embedded.html?t=' + Date.now() + `&lan=${g_is_cn ? 'zh' : 'en'}`
+    return 'http://mnote.netqon.com/embedded.html?t=' + Date.now() + `&lan=${g_is_cn ? 'zh' : 'en'}`
 }
 
 exports.get_file_ext = (p) => {
@@ -75,5 +75,5 @@ exports.get_file_ext = (p) => {
 }
 
 exports.get_product_site_url = () => {
-    return 'http://mwriter.netqon.com?ref=mwriter'
+    return 'http://mnote.netqon.com?ref=mnote'
 }

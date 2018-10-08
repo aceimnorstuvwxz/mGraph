@@ -1,11 +1,11 @@
 {
-  "name": "mwriter",
+  "name": "mnote",
   "version": "0.2.0",
-  "productName": "MWriter",
+  "productName": "mnote",
   "description": "Markdown Writer for hackers",
   "main": "main.js",
   "build": {
-    "appId": "com.netqon.mwriter",
+    "appId": "com.netqon.mnote",
     "mac": {
       "category": "public.app-category.productivity"
     },
@@ -14,7 +14,7 @@
       "extraFiles": "*.dll"
     }
   },
-  "repository": "https://github.com/fateleak/mwriter",
+  "repository": "https://github.com/fateleak/mnote",
   "keywords": [
     "Netqon",
     "BoringUniverse",

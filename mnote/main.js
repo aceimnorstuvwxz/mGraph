@@ -149,11 +149,11 @@ function get_menu_template() {
       submenu: [
         {
           label: lg('反馈', 'Feedback'),
-          click() { require('electron').shell.openExternal('https://github.com/fateleak/mwriter/issues') }
+          click() { require('electron').shell.openExternal('https://github.com/fateleak/mnote/issues') }
         },
         {
           label: lg('官方网站', "Check for updates"),
-          click() { require('electron').shell.openExternal('http://mwriter.netqon.com') }
+          click() { require('electron').shell.openExternal('http://mnote.netqon.com') }
         },
         { type: 'separator' },
         {
@@ -169,7 +169,7 @@ function get_menu_template() {
     menuTemplate.unshift({
       label: app.getName(),
       submenu: [
-        { role: 'about', label: lg('关于 MWriter', 'About MWriter') },
+        { role: 'about', label: lg('关于 Mnote', 'About Mnote') },
         { type: 'separator' },
         {
           label: lg('偏好设置', 'Preferences'),
@@ -178,7 +178,7 @@ function get_menu_template() {
         },
         { role: 'services', label: lg('服务', 'Services'), submenu: [] },
         { type: 'separator' },
-        { role: 'hide', label: lg('隐藏 MWriter', 'Hide MWriter') },
+        { role: 'hide', label: lg('隐藏 Mnote', 'Hide Mnote') },
         { role: 'hideothers', label: lg('隐藏其它', 'Hide Others') },
         { role: 'unhide', label: lg('显示全部', 'Show All') },
         { type: 'separator' },
@@ -219,7 +219,7 @@ function get_menu_template() {
     menuTemplate[4].submenu.unshift(
       {
         role: 'about',
-        label: lg('关于 MWriter', 'About MWriter'),
+        label: lg('关于 Mnote', 'About Mnote'),
         click() { open_win('about') }
       }
     )

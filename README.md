@@ -1,6 +1,6 @@
-![](mwriter/build/icon.png)
+![](Mnote/build/icon.png)
 
-# MWriter beta
+# Mnote beta
 
 终极的支持插件的可定制的开源、免费的跨平台的markdown编辑器。
 
@@ -8,7 +8,7 @@
 努力成为，一个以黑客（极客）为目标用户群的，可插件可扩展因而能够生态化发展的，非商业的自由开源的，以中文为首语言全球化发展的，以文档写作为核心的编辑器。
 
 ## 下载
-[MWriter下载地址](http://mwriter.netqon.com)
+[Mnote下载地址](http://Mnote.netqon.com)
 
 ## 版本历史
 v0.1.0 2018年09月21日
@@ -24,7 +24,7 @@ v0.1.0 2018年09月21日
 支持单篇及目录整体的向HTML、PDF的释出。其中HTML释出亦支持主题。
 重点支持以文件夹做为HTML输出来轻松制作文档。
 
-[全部开发计划](https://github.com/fateleak/mwriter/issues)
+[全部开发计划](https://github.com/fateleak/Mnote/issues)
 
 ## FaQ
 - 何为以中文为首语言的全球化发展？
